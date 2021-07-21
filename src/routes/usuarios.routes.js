@@ -3,10 +3,16 @@ const usuariosController = require('../controllers/usuarios.controller');
 
 const router = Router();
 
-router.post('/', usuariosController.createUsuario);
-router.get('/', usuariosController.getUsuarios);
-router.get('/:id', usuariosController.getUsuario);
-router.put('/:id', usuariosController.editUsuario);
-router.delete('/:id', usuariosController.deleteUsuario);
+router.post('/registro/', usuariosController.createUsuarioComun);
+router.get('/registro/', usuariosController.getUsuariosComunes);
+router.get('/registro/:id', usuariosController.getUsuarioComun);
+router.put('/registro/:id', usuariosController.editUsuarioComun);
+router.delete('/registro/:id', usuariosController.deleteUsuarioComun);
+
+router.post('/registro-especial/', usuariosController.createUsuarioEspecial);
+router.get('/registro-especial/', usuariosController.getUsuariosEspeciales);
+router.get('/registro-especial/:id', usuariosController.getUsuarioEspecial);
+router.put('/registro-especial/:id', usuariosController.editUsuarioEspecial);
+router.delete('/registro-especial/:id', usuariosController.deleteUsuarioEspecial);
 
 module.exports = router;

@@ -1,29 +1,28 @@
 ###
-POST http://localhost:4000/usuarios HTTP/1.1
-Content-Type: application/json
-
-{
-    "nombre": "Taco2",
-    "apellidoPaterno": "Machuca",
-	"apellidoMaterno": "Da la teja",
-	"correoElectronico": "mikehotpussy@oio.poio",
-	"nombreUsuario": "xxChicoBuapo_PussyDestroyer1xx",
-	"contrasena": "1234",
-    "reputacion": 2
-}
-
-###
-GET http://localhost:4000/usuarios HTTP/1.1
-
-###
-GET http://localhost:4000/usuarios/60f5dc90f598fe1ea867eee9 HTTP/1.1
-
-###
-PUT http://localhost:4000/usuarios/60f5dc90f598fe1ea867eee9 HTTP/1.1
+POST http://localhost:4000/registro HTTP/1.1
 Content-Type: application/json
 
 {
     "nombre": "Taco3",
+    "apellidoPaterno": "Machuca",
+	"apellidoMaterno": "Da la teja",
+	"correoElectronico": "mikehotpussy@oio.poio",
+	"nombreUsuario": "xxChicoBuapo_PussyDestroyer1xx",
+	"contrasena": "1234"
+}
+
+###
+GET http://localhost:4000/registro HTTP/1.1
+
+###
+GET http://localhost:4000/registro/60f737acf7d19b0188172be0 HTTP/1.1
+
+###
+PUT http://localhost:4000/registro/60f737acf7d19b0188172be0 HTTP/1.1
+Content-Type: application/json
+
+{
+    "nombre": "Taco",
     "apellidoPaterno": "Antonio",
 	"apellidoMaterno": "Da la teja",
 	"correoElectronico": "mikehotpussy@oio.poiote",
@@ -33,4 +32,42 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:4000/usuarios/60f5dc6ef598fe1ea867eee6 HTTP/1.1
+DELETE http://localhost:4000/registro/60f7623ae8b1fa28a8990366 HTTP/1.1
+
+
+
+###
+POST http://localhost:4000/registro-especial HTTP/1.1
+Content-Type: application/json
+
+{
+    "nombre": "TacoEspecialAlPastor",
+    "apellidoPaterno": "Machuca",
+	"apellidoMaterno": "Da la teja",
+	"correoElectronico": "mikehotpussy@oio.poio",
+	"nombreUsuario": "xxChicoBuapo_PussyDestroyer1xx",
+	"contrasena": "4321"
+}
+
+###
+GET http://localhost:4000/registro-especial HTTP/1.1
+
+###
+GET http://localhost:4000/registro-especial/60f737ef30b5922620c44113 HTTP/1.1
+
+###
+PUT http://localhost:4000/registro-especial/60f737ef30b5922620c44113 HTTP/1.1
+Content-Type: application/json
+
+{
+    "nombre": "TacoEspecialDeSal",
+    "apellidoPaterno": "Antonio",
+	"apellidoMaterno": "Da la teja",
+	"correoElectronico": "mikehotpussy@oio.poiote",
+	"nombreUsuario": "xxChicoPrieto(no-por-eso-menos-guapo-pero-si-con-menos-derechos-,-ninguno)_PussyDestroyer2xx",
+	"contrasena": "12344321",
+    "reputacion": 10
+}
+
+###
+DELETE http://localhost:4000/registro-especial/60f8598034c7c12a185b0322 HTTP/1.1

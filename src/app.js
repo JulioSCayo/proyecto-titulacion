@@ -12,6 +12,6 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/registro', require('./routes/usuarios.routes'));
+app.use('', require('./routes/usuarios.routes'));
 
 module.exports = app;
