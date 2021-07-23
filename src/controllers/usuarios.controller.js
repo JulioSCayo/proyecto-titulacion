@@ -2,8 +2,6 @@ const usuariosController = {};
 
 const UsuarioComun = require('../models/UsuarioComun');
 const UsuarioEspecial = require('../models/UsuarioEspecial');
-const ImagenEspecial = require('../middleware/file');
-
 
 // Usuarios Comunes
 usuariosController.createUsuarioComun = async (req, res) => {
@@ -34,39 +32,12 @@ usuariosController.deleteUsuarioComun = async (req, res) => {
     res.json({status: 'Usuario Comun eliminado'});
 };
 
-
 // Usuarios Especiales
-
-//  ESTA MADRE DE ABAJO ES PARA INTENTAR HACER LO DE LA IMAGEN
-// usuariosController.createUsuarioEspecial = ImagenEspecial.single('imagen'), async (req, res) => {
-
-//     const url = req.protocol + '://' + req.get('host');
-//     let imagenUrl = null;
-
-//     if(req.file.filename) {
-//         imagenUrl = url + '/public/' + req.file.filename;
-//     }
-//     else {
-//         imagenUrl = null;
-//     }
-
-//     const nuevoUsuario = new UsuarioEspecial(req.body);
-//     nuevoUsuario.reputacion = 10;
-//     nuevoUsuario.validado = false;
-//     nuevoUsuario.imagen = imagenUrl;
-//     await nuevoUsuario.save();
-
-//     res.send({status: 'Usuario Especial creado'});
-// };
-
-
-// EN ESTE PONE LA IMAGEN CON UNA URL PROVISIONAL PARA QUE NO TRUENE, LOS DEMÁS ATRIBUTOS SI JALAN
 usuariosController.createUsuarioEspecial = async (req, res) => {
-
     const nuevoUsuario = new UsuarioEspecial(req.body);
     nuevoUsuario.reputacion = 10;
     nuevoUsuario.validado = false;
-    nuevoUsuario.imagen = 'ruta/provisional.png'; // Provisional hasta poder subir y guardar imagenes
+    nuevoUsuario.imagen = req.file.path;
     await nuevoUsuario.save();
 
     res.send({status: 'Usuario Especial creado'});

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const usuariosController = require('../controllers/usuarios.controller');
+const ImagenEspecial = require('../middleware/file');
 
 const router = Router();
 
@@ -9,7 +10,7 @@ router.get('/registro/:id', usuariosController.getUsuarioComun);
 router.put('/registro/:id', usuariosController.editUsuarioComun);
 router.delete('/registro/:id', usuariosController.deleteUsuarioComun);
 
-router.post('/registro-especial/', usuariosController.createUsuarioEspecial);
+router.post('/registro-especial/', ImagenEspecial.single('imagen'), usuariosController.createUsuarioEspecial);
 router.get('/registro-especial/', usuariosController.getUsuariosEspeciales);
 router.get('/registro-especial/:id', usuariosController.getUsuarioEspecial);
 router.put('/registro-especial/:id', usuariosController.editUsuarioEspecial);
