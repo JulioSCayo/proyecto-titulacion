@@ -16,4 +16,10 @@ router.get('/registro-especial/:id', usuariosController.getUsuarioEspecial);
 router.put('/registro-especial/:id', usuariosController.editUsuarioEspecial);
 router.delete('/registro-especial/:id', usuariosController.deleteUsuarioEspecial);
 
+router.post('/registro-responsable/', usuariosController.createUsuarioResp);
+router.get('/registro-responsable/', usuariosController.getUsuariosResps);
+router.get('/registro-responsable/:id', usuariosController.getUsuarioResp);
+router.put('/registro-responsable/:id', usuariosController.editUsuarioResp);
+router.delete('/registro-responsable/:id', usuariosController.deleteUsuarioResp);
+
 module.exports = router;

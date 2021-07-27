@@ -1,3 +1,5 @@
+// ------------------ USUARIO COMUN
+
 ###
 POST http://localhost:4000/registro HTTP/1.1
 Content-Type: application/json
@@ -36,6 +38,8 @@ DELETE http://localhost:4000/registro/60f7623ae8b1fa28a8990366 HTTP/1.1
 
 
 
+// ------------------ USUARIO ESPECIAL
+
 ###
 POST http://localhost:4000/registro-especial HTTP/1.1
 Content-Type: application/json
@@ -46,7 +50,8 @@ Content-Type: application/json
 	"apellidoMaterno": "Da la teja",
 	"correoElectronico": "mikehotpussy@oio.poio",
 	"nombreUsuario": "xxChicoBuapo_PussyDestroyer1xx",
-	"contrasena": "4321"
+	"contrasena": "4321",
+    "imagen": "direccion/de/prueba.jpg"
 }
 
 ###
@@ -71,3 +76,47 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:4000/registro-especial/60f8598034c7c12a185b0322 HTTP/1.1
+
+
+
+// ------------------ USUARIO REPONSABLE
+
+###
+POST  http://localhost:4000/registro-responsable HTTP/1.1
+Content-Type: application/json
+
+{
+    "institucion": "Infrestructura",
+    "nombreUsuario": "responsable1",
+	"contrasena": "responsable1"
+}
+
+###
+PUT http://localhost:4000/registro-responsable/61006fd8b7faf32618d440eb HTTP/1.1
+Content-Type: application/json
+
+{
+    "institucion": "Infrestructura",
+    "nombreUsuario": "responsable1",
+	"contrasena": "responsable1",
+	"reporteAsignado": {
+            "folio": "i0002",
+            "tipoProblema": "Socavon",
+            "urgencia": 85,
+            "fechaCreacion": "2021-01-20",
+            "estado": "Desatendido",
+            "ubicacion": {
+                "longitud": 201.145132,
+                "latitud": 20.5430167
+            }
+        }
+}
+
+###
+GET http://localhost:4000/registro-responsable HTTP/1.1
+
+###
+GET http://localhost:4000/registro-responsable/60fa2b8e338b1627308b9b12 HTTP/1.1
+
+###
+DELETE http://localhost:4000/registro-responsable/60fa2b8e338b1627308b9b12 HTTP/1.1
