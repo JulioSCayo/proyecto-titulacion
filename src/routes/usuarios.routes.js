@@ -22,4 +22,9 @@ router.get('/registro-responsable/:id', usuariosController.getUsuarioResp);
 router.put('/registro-responsable/:id', usuariosController.editUsuarioResp);
 router.delete('/registro-responsable/:id', usuariosController.deleteUsuarioResp);
 
+
+router.post('', usuariosController.signin);
+router.get('/privateTask/', usuariosController.verificarToken, usuariosController.privateTask);
+
+
 module.exports = router;

@@ -4,6 +4,7 @@ const bcryptjs = require('bcryptjs');
 const UsuarioComun = require('../models/UsuarioComun');
 const UsuarioEspecial = require('../models/UsuarioEspecial');
 const usuarioResponsable = require('../models/UsuarioResponsable');
+const jwt = require('jsonwebtoken');
 
 
 
@@ -15,7 +16,15 @@ usuariosController.createUsuarioComun = async (req, res) => {
     nuevoUsuario.reputacion = 2;
 
     await nuevoUsuario.save();
-    res.send({status: 'Usuario Comun creado'});
+
+
+    const token = jwt.sign({_id: nuevoUsuario._id}, 'llaveSecreta');
+    console.log(token)
+
+
+    res.status(200).json({token})
+    // res.send({status: 'Usuario Comun creado'});
+
 };
 
 usuariosController.getUsuariosComunes = async (req, res) => {
@@ -121,6 +130,75 @@ usuariosController.desencriptar = (contrasenaEnviada, contraseña) => {
     // esto por motivos de seguridad, para no desencriptar una y compararala asi
     return bcryptjs.compare(contraseñaPasada, contraseñaGuardadaEnLaBD);
 };
+
+
+usuariosController.signin = async (req, res) => {
+    const { nombreUsuario, contrasena } = req.body;
+
+    const usuario = await UsuarioComun.findOne({nombreUsuario});
+    if(!usuario) return res.status(401).send("El usuario no existe");
+
+    //los parametros de este metodo son la contraseña de texto plano, la contraseña encriptada y el callback
+    bcryptjs.compare(contrasena, usuario.contrasena, (err, coinciden) => {
+        if(err){
+            return res.status(401).send("error al comparar la contraseña");
+        }
+        if(coinciden == true){
+            const token = jwt.sign({_id: usuario._id}, 'llaveSecreta')
+            // console.log("El token es: ", token)
+    
+            return res.status(200).json({token})
+        }else{
+            return res.status(401).send("El usuario no existe");
+        }
+    })
+
+};
+
+
+usuariosController.privateTask =  (req, res) => {
+
+    res.json([
+        {
+            _id: 1,
+            nombre: "saul",
+            descripcion: "doble queso",
+        },
+        {
+            _id: 2,
+            nombre: "izcali",
+            descripcion: "triple queso",
+        }
+        
+    ])
+}
+
+
+
+
+
+
+usuariosController.verificarToken = (req, res, next) => {
+    // console.log(req.headers.authorization)
+
+    if(!req.headers.authorization){
+        return res.status(401).send("autorizacion no permitida");
+    }
+    
+    const token = req.headers.authorization.split(' ')[1]
+
+    if(token === 'null'){
+        return res.status(401).send("autorizacion no permitida");
+    }
+
+    const payload = jwt.verify(token, 'llaveSecreta')
+    console.log("payload", payload)
+
+    req.usuarioId = payload._id
+    next();
+}
+
+
 
 
 
