@@ -54,7 +54,7 @@ usuariosController.createUsuarioEspecial = async (req, res) => {
 };
 
 usuariosController.getUsuariosEspeciales = async (req, res) => {
-    const usuarios = await UsuarioEspecial.find();
+    const usuarios = await UsuarioEspecial.find().sort({validado:1});
     res.json(usuarios);
 };
 
