@@ -4,6 +4,7 @@ const bcryptjs = require('bcryptjs');
 const UsuarioComun = require('../models/UsuarioComun');
 const UsuarioEspecial = require('../models/UsuarioEspecial');
 const usuarioResponsable = require('../models/UsuarioResponsable');
+const fs = require('fs');
 
 
 
@@ -69,6 +70,11 @@ usuariosController.editUsuarioEspecial = async (req, res) => {
 };
 
 usuariosController.deleteUsuarioEspecial = async (req, res) => {
+    const usuario = await UsuarioEspecial.findById(req.params.id);
+    try {
+        fs.unlinkSync(usuario.imagen);
+    }
+    catch { }
     await UsuarioEspecial.findByIdAndDelete(req.params.id);
     res.json({status: 'Usuario Especial eliminado'});
 };
