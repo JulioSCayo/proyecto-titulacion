@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('', require('./routes/usuarios.routes'));
+app.use('', require('./routes/reportes.routes'));
 app.use('/public', express.static(path.resolve('public')));
 
 

@@ -30,6 +30,8 @@ usuariosController.createUsuarioEspecial = async (req, res) => {
     nuevoUsuario.usuarioEspecial.validado = false;
     nuevoUsuario.usuarioEspecial.imagen = req.file.path;
 
+    console.log(req.body);
+
     await nuevoUsuario.save();
     res.send({status: 'Usuario Especial creado'});
 };
