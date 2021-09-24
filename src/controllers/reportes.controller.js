@@ -5,13 +5,19 @@ const reporte = require('../models/Reportes');
 // Crear reporte
 reportesController.createReporte = async (req, res) => {
     const nuevoReporte = new reporte(req.body);
+    console.log("........................................................")
+    console.log(req.body);
 
     nuevoReporte.folio = '1';
     nuevoReporte.estado = 'Desatendido';
+    nuevoReporte.credibilidad = 2; // la credibilidad creo que no deberia ser requerida, al menos que que 
+                                    // sea igual a la actual mas los puntos de fiabilidad de la persona que lo reporto
+    // nuevoReporte.tipoProblema = 'agua'; // el dato deberia venir de front
     nuevoReporte.fechaCreacion = Date.now();
 
-    console.log(req.body);
-    // await createReporte.save();
+    console.log(nuevoReporte);
+    // console.log(req.body);
+    await nuevoReporte.save();
     res.status(200).json({'estado': 'ok'})
 };
 

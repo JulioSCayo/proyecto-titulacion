@@ -204,6 +204,9 @@ usuariosController.signin = async (req, res) => {
         if(coinciden == true){
             const token = jwt.sign({_id: usuarioIngresado._id}, 'llaveSecreta')
             let tipoUsuario = "comun";
+            let idUsuario = usuarioIngresado._id;
+
+            if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
 
             if(usuarioIngresado.usuarioAdmin)
                 tipoUsuario = "admin";
@@ -212,12 +215,31 @@ usuariosController.signin = async (req, res) => {
             else if (usuarioIngresado.usuarioResponsable)
                 tipoUsuario = "responsable";
     
-            return res.status(200).json({token, tipoUsuario})
+            return res.status(200).json({token, idUsuario, tipoUsuario})
         }else{
             return res.status(401).send("El usuario no existe");
         }
     })
 
+};
+
+
+usuariosController.TipoUsuario = async (req, res) => {
+    const usuarioEncontrado  = await usuario.findById(req.params.id);
+    console.log(usuarioEncontrado)
+
+    if(!usuarioEncontrado) return res.status(401).send("El usuario no existe");
+
+            let tipoUsuario = "comun";
+
+            if(usuarioEncontrado.usuarioAdmin)
+                tipoUsuario = "admin";
+            else if(usuarioEncontrado.usuarioEspecial)
+                tipoUsuario = "especial";
+            else if (usuarioEncontrado.usuarioResponsable)
+                tipoUsuario = "responsable";
+    
+            return res.status(200).json(tipoUsuario)
 };
 
 
