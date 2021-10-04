@@ -94,9 +94,14 @@ usuariosController.getUsuariosComunes = async (req, res) => {
 };
 
 usuariosController.getUsuariosEspeciales = async (req, res) => {
-    // const usuarios = await usuario.find({usuarioEspecial: {$exists:true}}).sort({usuarioEspecial: {validado: 1}});
-    const usuarios = await usuario.find({usuarioEspecial: {$exists:true}});
-    res.json(usuarios);
+    try{
+        let usuarios1 = await usuario.find({$and: [ {usuarioEspecial: {$exists:true}}, { 'usuarioEspecial.validado': true}]});
+        let usuarios2 = await usuario.find({$and: [ {usuarioEspecial: {$exists:true}}, { 'usuarioEspecial.validado': false}]});
+
+            return res.status(200).json({usuarios1, usuarios2})
+    }catch(error){
+        console.log(error)
+    }
 };
 
 usuariosController.getUsuariosResponsables = async (req, res) => {
