@@ -1,22 +1,22 @@
 const reportesController = {};
 
 const reporte = require('../models/Reportes');
+const usuario = require('../models/Usuarios');
 
 // Crear reporte
 reportesController.createReporte = async (req, res) => {
     const nuevoReporte = new reporte(req.body);
+    const getUsuario = await usuario.findById(nuevoReporte.usuarios);
+    
     console.log("........................................................")
     console.log(req.body);
 
     nuevoReporte.folio = '1';
     nuevoReporte.estado = 'Desatendido';
-    nuevoReporte.credibilidad = 2; // la credibilidad creo que no deberia ser requerida, al menos que que 
-                                    // sea igual a la actual mas los puntos de fiabilidad de la persona que lo reporto
-    // nuevoReporte.tipoProblema = 'agua'; // el dato deberia venir de front
+    nuevoReporte.credibilidad = getUsuario.reputacion;
     nuevoReporte.fechaCreacion = Date.now();
 
     console.log(nuevoReporte);
-    // console.log(req.body);
     await nuevoReporte.save();
     res.status(200).json({'estado': 'ok'})
 };
@@ -24,10 +24,13 @@ reportesController.createReporte = async (req, res) => {
 // Reportar problema ya existente
 reportesController.replicarReporte = async (req, res) => {
     const getReporte = await reporte.findById(req.params.id);
+    const getUsuario = await usuario.findById(req.body.usuarios);
+    console.log(getUsuario);
 
-    getReporte.credibilidad = getReporte.credibilidad + req.body.credibilidad;
+    getReporte.credibilidad = getReporte.credibilidad + getUsuario.reputacion;
     getReporte.usuarios.push(req.body.usuarios);
 
+    console.log(getReporte);
     await reporte.findByIdAndUpdate(req.params.id, getReporte);
     res.json({status: "Reporte replicado"});
 };

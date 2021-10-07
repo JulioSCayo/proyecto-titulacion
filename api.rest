@@ -17,7 +17,7 @@ Content-Type: application/json
 GET http://localhost:4000/registro HTTP/1.1
 
 ###
-GET http://localhost:4000/registro/60f737acf7d19b0188172be0 HTTP/1.1
+GET http://localhost:4000/registro/6149eacf35b42b1870dc9a39 HTTP/1.1
 
 ###
 GET http://localhost:4000/buscarComun HTTP/1.1
@@ -257,4 +257,4 @@ GET http://localhost:4000/reporte/6147d468c928ec1a80b0ba52 HTTP/1.1
 // ELIMINAR REPORTE
 
 ###
-DELETE http://localhost:4000/reporte/6159412f7ed2d61344f149c0 HTTP/1.1
+DELETE http://localhost:4000/reporte/615e240e2d40bf0b50e0a3c0 HTTP/1.1
