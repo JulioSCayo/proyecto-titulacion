@@ -10,7 +10,7 @@ router.post('/nuevo-reporte/', reportesController.createReporte);
 router.put('/replicar-reporte/:id', reportesController.replicarReporte);
 
 // Listar todos los reportes de un tipo
-router.get('/reportes-tipo/', reportesController.getTipoReportes);
+router.get('/reportes-tipo/:tipo', reportesController.getTipoReportes);
 
 // Listar todos los reportes
 router.get('/reportes/', reportesController.getReportes);

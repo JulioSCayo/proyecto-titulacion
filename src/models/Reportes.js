@@ -1,7 +1,6 @@
 const { Schema, model, Types } = require('mongoose');
 
 const reporteSchema = new Schema({
-	folio: {type: String, required: true},
 	estado: {type: String, required: true},
 	ubicacion: {
 		longitud: {type: Number, required: true},
@@ -11,7 +10,11 @@ const reporteSchema = new Schema({
 	fechaCreacion: {type: Date, required: true},
 	fechaSolucion: {type: Date, required: false},
 	credibilidad: {type: Number, required: true},
-	urgencia: {type: Number, required: false},
+	urgenciaTiempo: {type: Number, required: false},
+	comentario: {type: String, required: false},
+	vidaRiesgo: {type: Number, required: false},
+	cronico: {type: Boolean, required: false},
+	fantasma: {type: Boolean, required: false},
 	usuarios: [
         {
             _id: {type: Types.ObjectId, required: false}
