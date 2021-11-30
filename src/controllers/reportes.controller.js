@@ -80,6 +80,12 @@ reportesController.getTipoReportes = async (req, res) => {
     res.json(getReportes);
 };
 
+// Listar todos los reportes en un estado
+reportesController.getEstadoReportes = async (req, res) => {
+    const getReportes = await reporte.find({estado: req.params.estado});
+    res.json(getReportes);
+};
+
 // Listar todos los reportes
 reportesController.getReportes = async (req, res) => {
     const getReportes = await reporte.find();

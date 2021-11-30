@@ -12,6 +12,9 @@ router.put('/replicar-reporte/:id', reportesController.replicarReporte);
 // Listar todos los reportes de un tipo
 router.get('/reportes-tipo/:tipo', reportesController.getTipoReportes);
 
+// Listar todos los reportes en un estado
+router.get('/reportes-estado/:estado', reportesController.getEstadoReportes);
+
 // Listar todos los reportes
 router.get('/reportes/', reportesController.getReportes);
 
