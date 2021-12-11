@@ -18,6 +18,12 @@ router.get('/reportes-estado/:estado', reportesController.getEstadoReportes);
 // Listar todos los reportes
 router.get('/reportes/', reportesController.getReportes);
 
+// Listar todos los reportes que no esten asignados
+router.get('/reportes-no-asignados/', reportesController.getReportesNoAsignados);
+
+// buscar un reporte asignado
+router.get('/reporte-asignado/:id', reportesController.getReporteAsignado);
+
 // Buscar un solo reporte
 router.get('/reporte/:id', reportesController.getReporte);
 

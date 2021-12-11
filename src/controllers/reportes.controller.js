@@ -86,10 +86,28 @@ reportesController.getEstadoReportes = async (req, res) => {
     res.json(getReportes);
 };
 
+reportesController.getReportesNoAsignados = async (req, res) => {
+    const getReportes = await reporte.find({asignado: {$exists:false}});
+    res.json(getReportes);
+};
+
 // Listar todos los reportes
 reportesController.getReportes = async (req, res) => {
     const getReportes = await reporte.find();
     res.json(getReportes);
+};
+
+// Busca reportes asignado y que el estado sea en ruta
+reportesController.getReporteAsignado = async (req, res) => {
+    const getReporteAsignado = await reporte.find({$and: [{asignado: req.params.id}, {estado: "En ruta"}]});
+
+    console.log(getReporteAsignado.toString())
+
+    if(getReporteAsignado.toString() == ""){
+        res.json(false)
+    }else{
+        res.json(getReporteAsignado);
+    }
 };
 
 // Buscar un solo reporte
