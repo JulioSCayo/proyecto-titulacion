@@ -113,8 +113,8 @@ usuariosController.getUsuariosResponsables = async (req, res) => {
 
 // Buscar un usuario
 usuariosController.getUsuario = async (req, res) => {
-    const usuario = await usuario.findById(req.params.id);
-    res.send(usuario);
+    const usuarioEncontrado = await usuario.findById(req.params.id);
+    res.send(usuarioEncontrado);
 };
 
 
