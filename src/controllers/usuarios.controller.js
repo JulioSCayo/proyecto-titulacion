@@ -220,7 +220,7 @@ usuariosController.signin = async (req, res) => {
             else if (usuarioIngresado.usuarioResponsable)
                 tipoUsuario = "responsable";
     
-            return res.status(200).json({token, idUsuario, tipoUsuario})
+            return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario})
         }else{
             return res.status(401).send("El usuario no existe");
         }

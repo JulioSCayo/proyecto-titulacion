@@ -82,8 +82,72 @@ reportesController.getTipoReportes = async (req, res) => {
 
 // Listar todos los reportes en un estado
 reportesController.getEstadoReportes = async (req, res) => {
-    const getReportes = await reporte.find({estado: req.params.estado});
-    res.json(getReportes);
+    let aux = req.params.estado
+    let separar = aux.split("$")
+    let getReportes = [], reportes = [], cont = 0;
+    
+    // getReportes = await reporte.find();
+    // res.json(getReportes);
+
+    
+    if(separar[0] == "En proceso")
+         getReportes = await reporte.find({$or: [{estado: "En ruta"}, {estado:"En proceso"}]});
+    else
+         getReportes = await reporte.find({estado: separar[0]});
+    
+    //'alumbrado':'inundacion': 'fuga': 'faltaAlcantarilla': 'alcantarillaObstruida': 'escombros': 'vehiculo': 'arbol': 'socavon': 'cables': 'incendio':
+
+    // ** ATENCION: CREO QUE FALTA AGREGAR ALGUNAS INSTITUCIONES (desde el registro, quizas)
+
+        switch (separar[1].substr(0,2)) { //checa las iniciales del usuario para saber a que institucion pertenece
+            case "SP":
+                cont = 0;
+                getReportes.forEach(e => {
+                    if(e.tipoProblema == "inundacion" || e.tipoProblema == "fuga" || e.tipoProblema == "faltaAlcantarilla" || e.tipoProblema == "alcantarillaObstruida"){
+                        reportes.push(e) //guarda en un nuevo arreglo los reportes que correspondan al tipo que soluciona la institucion del usuario que realiza la peticion
+                    }
+                    cont++;
+                });
+            break;      
+                        
+            case "IF":
+                cont = 0;
+                getReportes.forEach(e => {
+                    if(e.tipoProblema == "socavon"){
+                        reportes.push(e)
+                    }
+                    cont++;
+                });
+            break;
+    
+            case "BM":
+                cont = 0;
+                getReportes.forEach(e => {
+                    if(e.tipoProblema == "incendio"){
+                        reportes.push(e)
+                    }
+                    cont++;
+                }); 
+            break;
+            
+            case "CF":
+                cont = 0;
+                getReportes.forEach(e => {
+                    if(e.tipoProblema == "alumbrado" || e.tipoProblema == "cables"){
+                        reportes.push(e)
+                    }
+                    cont++;
+                });
+            break;
+                
+            default:
+                console.log("Ocurrio algo raro (y por ende se enviaron todos los reportes)")
+                reportes = getReportes;
+            break;
+        }
+                
+    res.json(reportes);
+    
 };
 
 reportesController.getReportesNoAsignados = async (req, res) => {
