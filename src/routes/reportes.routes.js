@@ -9,6 +9,12 @@ router.post('/nuevo-reporte/', reportesController.createReporte);
 // Reportar problema ya existente
 router.put('/replicar-reporte/:id', reportesController.replicarReporte);
 
+// Reasignar un reporte a una nueva institucion
+router.get('/reasignar-reporte/:id', reportesController.reasignarReporte);
+
+// Enviar refuerzos a un problema
+router.get('/refuerzo-reporte/:id', reportesController.refuerzoReporte);
+
 // Listar todos los reportes de un tipo
 router.get('/reportes-tipo/:tipo', reportesController.getTipoReportes);
 

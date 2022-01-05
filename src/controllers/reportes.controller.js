@@ -1,5 +1,7 @@
 const reportesController = {};
 
+const mongoose = require('mongoose');
+
 const reporte = require('../models/Reportes');
 const usuario = require('../models/Usuarios');
 
@@ -21,7 +23,6 @@ reportesController.createReporte = async (req, res) => {
         nuevoReporte.credibilidad = getUsuario.reputacion;
     }
 
-    nuevoReporte.urgencia = 0;
     nuevoReporte.urgenciaTiempo = 0; // Se coloca la urgenciaTiempo como 0 inicialmente
     nuevoReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido inicialmente
     nuevoReporte.fechaCreacion = Date.now(); // Se coloca la fecha de creación
@@ -68,6 +69,50 @@ reportesController.replicarReporte = async (req, res) => {
 
     await reporte.findByIdAndUpdate(req.params.id, getReporte); // Se replica/actualiza el reporte
     res.json(getReporte._id); // Se regresa el id del reporte al frontend
+};
+
+
+
+// Reasignar un reporte a una nueva institucion
+reportesController.reasignarReporte = async (req, res) => {
+    let aux = req.params.id
+    let separar = aux.split("$")
+
+    const getReporte = await reporte.findById(separar[0]);
+    
+
+    console.log("Viejo:");
+    console.log(getReporte);
+
+    getReporte._id = new mongoose.Types.ObjectId();
+    getReporte.tipoProblema = separar[1];
+
+    console.log("Nuevo:");
+    console.log(getReporte);
+
+    // await getReporte.save(); // Se guarda el reporte
+
+    res.json({status: 'Reporte reasignado'});
+};
+
+
+
+// Enviar refuerzos a un problema
+reportesController.refuerzoReporte = async (req, res) => {
+    const getReporte = await reporte.findById(req.params.id);
+
+    console.log("Viejo:");
+    console.log(getReporte);
+
+    getReporte.urgenciaTiempo = 10000000; // Se coloca la urgenciaTiempo como 10000000 para ser el problema con más urgencia
+    getReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido para poder ser reasignado a una cuadrilla de la misma institucion
+
+    console.log("Nuevo:");
+    console.log(getReporte);
+    
+    // await reporte.findByIdAndUpdate(req.body, getReporte); // Se actualiza el reporte
+
+    res.json({status: 'Refuerzos solicitados'});
 };
 
 
