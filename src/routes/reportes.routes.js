@@ -25,7 +25,7 @@ router.get('/reportes-estado/:estado', reportesController.getEstadoReportes);
 router.get('/reportes/', reportesController.getReportes);
 
 // Listar todos los reportes que no esten asignados
-router.get('/reportes-no-asignados/', reportesController.getReportesNoAsignados);
+router.get('/reportes-no-asignados/:nombreUsuario', reportesController.getReportesNoAsignados);
 
 // buscar un reporte asignado
 router.get('/reporte-asignado/:id', reportesController.getReporteAsignado);
@@ -38,5 +38,8 @@ router.put('/reporte/:id', reportesController.editReporte);
 
 // Borrar un reporte
 router.delete('/reporte/:id', reportesController.deleteReporte);
+
+// Busca los datos de los usuarios que reportaron x problema
+router.post('/infoUsuariosReporte/', reportesController.infoUsuariosReporte);
 
 module.exports = router;

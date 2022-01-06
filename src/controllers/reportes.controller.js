@@ -43,6 +43,7 @@ reportesController.createReporte = async (req, res) => {
 
 // Reportar problema ya existente
 reportesController.replicarReporte = async (req, res) => {
+    // console.log(req)
     const getReporte = await reporte.findById(req.params.id);
 
     // Si el usuario que reportó el problema es invitado la credibilidad será 1 
@@ -129,76 +130,81 @@ reportesController.getTipoReportes = async (req, res) => {
 reportesController.getEstadoReportes = async (req, res) => {
     let aux = req.params.estado
     let separar = aux.split("$")
-    let getReportes = [], reportes = [], cont = 0;
-    
-    // getReportes = await reporte.find();
-    // res.json(getReportes);
+    let getReportes = [];
 
-    
     if(separar[0] == "En proceso")
          getReportes = await reporte.find({$or: [{estado: "En ruta"}, {estado:"En proceso"}]});
     else
          getReportes = await reporte.find({estado: separar[0]});
-    
-    //'alumbrado':'inundacion': 'fuga': 'faltaAlcantarilla': 'alcantarillaObstruida': 'escombros': 'vehiculo': 'arbol': 'socavon': 'cables': 'incendio':
-
-    // ** ATENCION: CREO QUE FALTA AGREGAR ALGUNAS INSTITUCIONES (desde el registro, quizas)
-
-        switch (separar[1].substr(0,2)) { //checa las iniciales del usuario para saber a que institucion pertenece
-            case "SP":
-                cont = 0;
-                getReportes.forEach(e => {
-                    if(e.tipoProblema == "inundacion" || e.tipoProblema == "fuga" || e.tipoProblema == "faltaAlcantarilla" || e.tipoProblema == "alcantarillaObstruida"){
-                        reportes.push(e) //guarda en un nuevo arreglo los reportes que correspondan al tipo que soluciona la institucion del usuario que realiza la peticion
-                    }
-                    cont++;
-                });
-            break;      
-                        
-            case "IF":
-                cont = 0;
-                getReportes.forEach(e => {
-                    if(e.tipoProblema == "socavon"){
-                        reportes.push(e)
-                    }
-                    cont++;
-                });
-            break;
-    
-            case "BM":
-                cont = 0;
-                getReportes.forEach(e => {
-                    if(e.tipoProblema == "incendio"){
-                        reportes.push(e)
-                    }
-                    cont++;
-                }); 
-            break;
-            
-            case "CF":
-                cont = 0;
-                getReportes.forEach(e => {
-                    if(e.tipoProblema == "alumbrado" || e.tipoProblema == "cables"){
-                        reportes.push(e)
-                    }
-                    cont++;
-                });
-            break;
                 
-            default:
-                console.log("Ocurrio algo raro (y por ende se enviaron todos los reportes)")
-                reportes = getReportes;
-            break;
-        }
-                
-    res.json(reportes);
-    
+    res.json(separarReportesPorInstitucion(separar[1].substr(0,2), getReportes));
 };
+
+
 
 reportesController.getReportesNoAsignados = async (req, res) => {
     const getReportes = await reporte.find({asignado: {$exists:false}});
-    res.json(getReportes);
+    console.log(req.params.nombreUsuario)
+
+    res.json(separarReportesPorInstitucion(req.params.nombreUsuario.substr(0,2), getReportes));
 };
+
+
+function separarReportesPorInstitucion(institucion, getReportes){
+    let reportes = [], cont = 0;
+    //'alumbrado':'inundacion': 'fuga': 'faltaAlcantarilla': 'alcantarillaObstruida': 'escombros': 'vehiculo': 'arbol': 'socavon': 'cables': 'incendio':
+    // ** ATENCION: CREO QUE FALTA AGREGAR ALGUNAS INSTITUCIONES (desde el registro, quizas)
+    switch (institucion) { //checa las iniciales del usuario para saber a que institucion pertenece
+        case "SP":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "inundacion" || e.tipoProblema == "fuga" || e.tipoProblema == "faltaAlcantarilla" || e.tipoProblema == "alcantarillaObstruida"){
+                    reportes.push(e) //guarda en un nuevo arreglo los reportes que correspondan al tipo que soluciona la institucion del usuario que realiza la peticion
+                }
+                cont++;
+            });
+        break;      
+                    
+        case "IF":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "socavon"){
+                    reportes.push(e)
+                }
+                cont++;
+            });
+        break;
+
+        case "BM":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "incendio"){
+                    reportes.push(e)
+                }
+                cont++;
+            }); 
+        break;
+        
+        case "CF":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "alumbrado" || e.tipoProblema == "cables"){
+                    reportes.push(e)
+                }
+                cont++;
+            });
+        break;
+            
+        default:
+            console.log("Ocurrio algo raro (y por ende se enviaron todos los reportes)")
+            reportes = getReportes;
+        break;
+    }
+
+    console.log(reportes)
+    return reportes
+}
+
 
 // Listar todos los reportes
 reportesController.getReportes = async (req, res) => {
@@ -364,6 +370,22 @@ reportesController.urgenciaTiempo = async (_id) => {
     }, tiempo)
 }
 
+
+
+reportesController.infoUsuariosReporte = async (req, res) => {
+    const usuarios = await usuario.find();
+    let usuariosReporte = [];
+
+    req.body.forEach(eR => {
+        usuarios.forEach(eU => {
+            if(eU._id == eR._id){
+                usuariosReporte.push(eU)
+            }
+        });
+    });
+
+    res.send(usuariosReporte);
+};
 
 
 module.exports = reportesController;
