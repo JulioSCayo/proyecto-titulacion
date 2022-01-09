@@ -121,7 +121,17 @@ usuariosController.getUsuario = async (req, res) => {
 
 // Editar un usuario
 usuariosController.editUsuario = async (req, res) => {
-    await usuario.findByIdAndUpdate(req.params.id, req.body);
+    var { nombreUsuario, contrasena } = req.body;
+
+    if(nombreUsuario != '') {
+    console.log(nombreUsuario);
+    await usuario.findByIdAndUpdate(req.params.id, {nombreUsuario: nombreUsuario});
+    }
+    if(contrasena != '') {
+    console.log(contrasena);
+    contrasena = usuariosController.encriptar(contrasena);
+    await usuario.findByIdAndUpdate(req.params.id, {contrasena: contrasena});
+    }
     res.json({status: 'Usuario actualizado'});
 };
 
@@ -148,29 +158,34 @@ usuariosController.deleteUsuario = async (req, res) => {
 // Buscar usuario o correo repetido
 usuariosController.buscarUsuarioRepetido = async (req, res) => {
     const { nombreUsuario } = req.body;
+    var existe;
+
+    console.log(nombreUsuario);
 
     const usuarioIngresado = await usuario.findOne({nombreUsuario});
     if(!usuarioIngresado){   
         // return res.status(401).send("El usuario no existe");
-        res.send(false);
+        existe = false;
     }else{
         // return res.status(300).send("El usuario si existe");
-        res.send(true);
+        existe = true;
     }
-
+    res.status(200).json({existe});
 };
 
 usuariosController.buscarCorreoRepetido = async (req, res) => {
     const { correoElectronico } = req.body;
+    var existe;
 
     const usuarioIngresado = await usuario.findOne({correoElectronico});
     if(!usuarioIngresado){   
         // return res.status(401).send("El usuario no existe");
-        res.send(false);
+        existe = false;
     }else{
         // return res.status(300).send("El usuario si existe");
-        res.send(true);
+        existe = true;  
     }
+    res.status(200).json({existe});
 };
 
 
@@ -190,6 +205,21 @@ usuariosController.desencriptar = (contrasenaEnviada, contraseña) => {
     // entonces se encripta la contraseña que le pasaron y la compara con la encriptada guardada en la bd
     // esto por motivos de seguridad, para no desencriptar una y compararala asi
     return bcryptjs.compare(contraseñaPasada, contraseñaGuardadaEnLaBD);
+};
+
+usuariosController.compararContrasenas = async (req, res) => {
+    const { id, contrasena } = req.body;
+
+    const usr = await usuario.findById(id);
+    const contrasenaBD = usr.contrasena;
+    console.log(contrasenaBD);
+    
+    bcryptjs.compare(contrasena, contrasenaBD, (err, coinciden) => {
+        if(err){
+            return res.status(401).send("error al comparar la contraseña");
+        }
+        res.status(200).json({coinciden});
+    });
 };
 
 

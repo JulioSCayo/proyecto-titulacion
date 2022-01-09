@@ -30,6 +30,9 @@ router.get('/reportes-no-asignados/:nombreUsuario', reportesController.getReport
 // buscar un reporte asignado
 router.get('/reporte-asignado/:id', reportesController.getReporteAsignado);
 
+// buscar los reportes de un usuario en específico
+router.get('/reportes-usuario/:usuario', reportesController.getReportesUsuario);
+
 // Buscar un solo reporte
 router.get('/reporte/:id', reportesController.getReporte);
 

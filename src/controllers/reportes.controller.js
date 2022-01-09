@@ -225,6 +225,17 @@ reportesController.getReporteAsignado = async (req, res) => {
     }
 };
 
+// Busca los reportes de un usuario específico
+reportesController.getReportesUsuario = async (req, res) => {
+    const getReportesUsuario = await reporte.find({usuarios: {_id: req.params.usuario}});
+
+    if(getReportesUsuario.toString() == ""){
+        res.json(false)
+    }else{
+        res.json(getReportesUsuario);
+    }
+};
+
 // Buscar un solo reporte
 reportesController.getReporte = async (req, res) => {
     const getReporte = await reporte.findById(req.params.id);
@@ -237,6 +248,7 @@ reportesController.getReporte = async (req, res) => {
 
 // Editar un reporte
 reportesController.editReporte = async (req, res) => {
+    console.log(req.body);
     await reporte.findByIdAndUpdate(req.params.id, req.body);
     res.json({status: 'Reporte actualizado'});
 };

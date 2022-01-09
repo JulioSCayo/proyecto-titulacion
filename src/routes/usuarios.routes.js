@@ -28,6 +28,9 @@ router.get('/CorreoRepetido/:id', usuariosController.buscarCorreoRepetido);
 // Ingresar
 router.post('', usuariosController.signin);
 
+// Comparar contraseñas
+router.post('/comparar/', usuariosController.compararContrasenas);
+
 // router.get('/privateTask/', usuariosController.verificarToken, usuariosController.privateTask);
 
 
