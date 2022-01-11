@@ -76,24 +76,39 @@ reportesController.replicarReporte = async (req, res) => {
 
 // Reasignar un reporte a una nueva institucion
 reportesController.reasignarReporte = async (req, res) => {
-    let aux = req.params.id
-    let separar = aux.split("$")
+    let aux = req.params.id;
+    let separar = aux.split("$");
 
     const getReporte = await reporte.findById(separar[0]);
-    
+    const nuevoReporte = new reporte({
+        estado: "Desatendido",
+        ubicacion: getReporte.ubicacion,
+        tipoProblema: separar[1],
+        fechaCreacion: getReporte.fechaCreacion,
+        credibilidad: getReporte.credibilidad,
+        urgenciaTiempo: getReporte.urgenciaTiempo,
+        comentario: getReporte.comentario,
+        vidaRiesgo: getReporte.vidaRiesgo,
+        cronico: getReporte.cronico,
+        usuarios: getReporte.usuarios
+    });
 
     console.log("Viejo:");
     console.log(getReporte);
 
-    getReporte._id = new mongoose.Types.ObjectId();
-    getReporte.tipoProblema = separar[1];
+    if(nuevoReporte.cronico == true) {
+        // Si hay 2 coincidencias se coloca como crónico, sino como no cronico
+        nuevoReporte.cronico = await reportesController.reporteCronico(nuevoReporte._id, nuevoReporte.ubicacion.latitud, nuevoReporte.ubicacion.longitud, nuevoReporte.tipoProblema);
+    }
 
     console.log("Nuevo:");
-    console.log(getReporte);
+    console.log(nuevoReporte);
 
-    // await getReporte.save(); // Se guarda el reporte
+    await nuevoReporte.save(); // Se guarda el reporte
 
     res.json({status: 'Reporte reasignado'});
+
+    reportesController.urgenciaTiempo(nuevoReporte._id); // Se inicia el algoritmo de urgenciaTiempo
 };
 
 
@@ -111,7 +126,7 @@ reportesController.refuerzoReporte = async (req, res) => {
     console.log("Nuevo:");
     console.log(getReporte);
     
-    // await reporte.findByIdAndUpdate(req.body, getReporte); // Se actualiza el reporte
+    await reporte.findByIdAndUpdate(req.params.id, getReporte); // Se actualiza el reporte
 
     res.json({status: 'Refuerzos solicitados'});
 };
@@ -123,6 +138,7 @@ reportesController.refuerzoReporte = async (req, res) => {
 // Listar todos los reportes de un tipo
 reportesController.getTipoReportes = async (req, res) => {
     const getReportes = await reporte.find({tipoProblema: req.params.tipo});
+    console.log(getReportes)
     res.json(getReportes);
 };
 
