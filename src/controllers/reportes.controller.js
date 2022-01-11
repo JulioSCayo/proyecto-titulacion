@@ -180,6 +180,26 @@ function separarReportesPorInstitucion(institucion, getReportes){
                 cont++;
             });
         break;      
+
+        case "PC":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "escombros" || e.tipoProblema == "arbol"){
+                    reportes.push(e) 
+                }
+                cont++;
+            });
+        break;      
+
+        case "SM":
+            cont = 0;
+            getReportes.forEach(e => {
+                if(e.tipoProblema == "vehiculo"){
+                    reportes.push(e) 
+                }
+                cont++;
+            });
+        break;      
                     
         case "IF":
             cont = 0;

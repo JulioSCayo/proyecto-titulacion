@@ -22,8 +22,11 @@ router.put('/registro/:id', usuariosController.editUsuario);
 router.delete('/registro/:id', usuariosController.deleteUsuario);
 
 // Buscar usuario o correo repetido
-router.post('/usuarioRepetido/', usuariosController.buscarUsuarioRepetido);
-router.get('/CorreoRepetido/:id', usuariosController.buscarCorreoRepetido);
+router.get('/usuarioRepetido/:id', usuariosController.buscarUsuarioRepetido);
+router.get('/correoRepetido/:id', usuariosController.buscarCorreoRepetido);
+
+router.get('/nombresUsuarios/', usuariosController.nombresUsuarios);
+// router.get('/correosUsuarios/', usuariosController.correoUsuarios);
 
 // Ingresar
 router.post('', usuariosController.signin);

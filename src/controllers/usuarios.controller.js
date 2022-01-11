@@ -62,6 +62,8 @@ usuariosController.createUsuarioResp = async (req, res, next) => {
             case 'Infrectructura': usuarioTemp = "IF" + (numResp + 1).toString().padStart(4, "0000") + "R"; break;  //IF00xxR
             case 'Bomberos': usuarioTemp = "BM" + (numResp + 1).toString().padStart(4, "0000") + "R"; break;        //BM00xxR
             case 'CFE': usuarioTemp = "CF" + (numResp + 1).toString().padStart(4, "0000") + "R"; break;             //CF00xxR
+            case 'Proteccion': usuarioTemp = "PC" + (numResp + 1).toString().padStart(4, "0000") + "R"; break;             //CF00xxR
+            case 'Movilidad': usuarioTemp = "SM" + (numResp + 1).toString().padStart(4, "0000") + "R"; break;             //CF00xxR
         }
   
         responsable.nombreUsuario = usuarioTemp;
@@ -70,11 +72,9 @@ usuariosController.createUsuarioResp = async (req, res, next) => {
         console.log("el nombre temporal es  ---->   ", responsable.nombreUsuario);
         responsable.save();
         
-        // nombreTemp = responsable.nombreUsuario;
-        res.status(200).json({usuarioTemp})
+        res.json(usuarioTemp)
     }, 1);
     
-    // res.status(200).send("usuario responsable creado")
 };
 
 
@@ -85,6 +85,27 @@ usuariosController.getUsuarios = async (req, res) => {
     res.json(usuarios);
 };
 
+
+usuariosController.nombresUsuarios = async (req, res) => {
+    let usuarios = await usuario.find();
+    let listaNombres = [];
+
+        // usuarios.foreach(e => {
+        //     listaNombres.push(e.nombreUsuario)
+        // })
+        
+        for(let i of usuarios){
+            listaNombres.push(i.nombreUsuario)
+
+        }
+        
+
+        console.log(listaNombres)
+
+
+    res.json(listaNombres);
+    // res.json(usuarios);
+};
 
 
 // Buscar usuarios por su tipo
