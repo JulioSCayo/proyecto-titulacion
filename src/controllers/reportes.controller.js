@@ -115,18 +115,21 @@ reportesController.reasignarReporte = async (req, res) => {
 
 // Enviar refuerzos a un problema
 reportesController.refuerzoReporte = async (req, res) => {
-    const getReporte = await reporte.findById(req.params.id);
+    let aux = req.params.id;
+    let separar = aux.split("$");
+
+    const getReporte = await reporte.findById(separar[0]);
 
     console.log("Viejo:");
     console.log(getReporte);
 
-    getReporte.urgenciaTiempo = 10000000; // Se coloca la urgenciaTiempo como 10000000 para ser el problema con más urgencia
+    getReporte.urgenciaTiempo = (parseInt(separar[1]) + 1); // Se coloca la urgencia del reporte más urgente, más 1 punto
     getReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido para poder ser reasignado a una cuadrilla de la misma institucion
 
     console.log("Nuevo:");
     console.log(getReporte);
     
-    await reporte.findByIdAndUpdate(req.params.id, getReporte); // Se actualiza el reporte
+    await reporte.findByIdAndUpdate(separar[0], getReporte); // Se actualiza el reporte
 
     res.json({status: 'Refuerzos solicitados'});
 };
