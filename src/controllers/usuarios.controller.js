@@ -347,6 +347,15 @@ usuariosController.createAdmin = async (req, res) => {
 //     ])
 // }
 
+usuariosController.cambiarContrasenaPerdida = async (req, res) => {
+    let { contrasena } = req.body;
+    
+    contrasena = usuariosController.encriptar(contrasena);
+    await usuario.findByIdAndUpdate(req.params.id, {contrasena: contrasena});
+
+    res.send("Bien");
+};
+
 
 
 module.exports = usuariosController;

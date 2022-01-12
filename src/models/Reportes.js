@@ -7,6 +7,7 @@ const reporteSchema = new Schema({
 		latitud: {type: Number, required: true}
     },
 	tipoProblema: {type: String, required: true},
+	imagen: {type: String, required: false},
 	fechaCreacion: {type: Date, required: true},
 	fechaSolucion: {type: Date, required: false},
 	credibilidad: {type: Number, required: true},

@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const usuariosController = require('../controllers/usuarios.controller');
-const ImagenEspecial = require('../middleware/file');
+const ImagenEspecial = require('../middleware/especial-imagen');
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.put('/registro/:id', usuariosController.editUsuario);
 router.delete('/registro/:id', usuariosController.deleteUsuario);
 
 // Buscar usuario o correo repetido
-router.get('/usuarioRepetido/:id', usuariosController.buscarUsuarioRepetido);
+router.post('/usuarioRepetido/', usuariosController.buscarUsuarioRepetido);
 router.get('/correoRepetido/:id', usuariosController.buscarCorreoRepetido);
 
 router.get('/nombresUsuarios/', usuariosController.nombresUsuarios);
@@ -33,6 +33,9 @@ router.post('', usuariosController.signin);
 
 // Comparar contraseñas
 router.post('/comparar/', usuariosController.compararContrasenas);
+
+// Cambiar contraseña perdida
+router.post('/cambiarContra/:id', usuariosController.cambiarContrasenaPerdida);
 
 // router.get('/privateTask/', usuariosController.verificarToken, usuariosController.privateTask);
 

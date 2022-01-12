@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const reportesController = require('../controllers/reportes.controller');
+const ImagenReporte = require('../middleware/reporte-imagen');
 
 const router = Router();
 
 // Crear reporte
-router.post('/nuevo-reporte/', reportesController.createReporte);
+router.post('/nuevo-reporte/:usuario', ImagenReporte.single('imagenReporte'), reportesController.createReporte);
 
 // Reportar problema ya existente
 router.put('/replicar-reporte/:id', reportesController.replicarReporte);
@@ -38,6 +39,9 @@ router.get('/reporte/:id', reportesController.getReporte);
 
 // Editar un reporte
 router.put('/reporte/:id', reportesController.editReporte);
+
+// Agregar imagen
+router.put('/imagen-reporte/:id', ImagenReporte.single('imagenReporte'), reportesController.editImagenReporte);
 
 // Borrar un reporte
 router.delete('/reporte/:id', reportesController.deleteReporte);

@@ -1,6 +1,7 @@
 const reportesController = {};
 
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 const reporte = require('../models/Reportes');
 const usuario = require('../models/Usuarios');
@@ -13,6 +14,14 @@ const usuario = require('../models/Usuarios');
 reportesController.createReporte = async (req, res) => {
     const nuevoReporte = new reporte(req.body);
 
+    nuevoReporte.usuarios.push({_id: req.params.usuario}) ;
+    nuevoReporte.urgenciaTiempo = 0; // Se coloca la urgenciaTiempo como 0 inicialmente
+    nuevoReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido inicialmente
+    nuevoReporte.fechaCreacion = Date.now(); // Se coloca la fecha de creación
+
+    if(req.file)
+        nuevoReporte.imagen = req.file.path;
+
     // Si el usuario que reportó el problema es invitado la credibilidad será 1
     if(!await usuario.findById(nuevoReporte.usuarios)) {
         nuevoReporte.credibilidad = 1;
@@ -22,10 +31,6 @@ reportesController.createReporte = async (req, res) => {
         const getUsuario = await usuario.findById(nuevoReporte.usuarios);
         nuevoReporte.credibilidad = getUsuario.reputacion;
     }
-
-    nuevoReporte.urgenciaTiempo = 0; // Se coloca la urgenciaTiempo como 0 inicialmente
-    nuevoReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido inicialmente
-    nuevoReporte.fechaCreacion = Date.now(); // Se coloca la fecha de creación
 
     // Si se recibe que es cronico desde el frontend se revisan las coincidencias de ubicación con otros problemas del mismo tipo
     if(nuevoReporte.cronico == true) {
@@ -287,8 +292,22 @@ reportesController.getReporte = async (req, res) => {
 
 // Editar un reporte
 reportesController.editReporte = async (req, res) => {
-    console.log(req.body);
     await reporte.findByIdAndUpdate(req.params.id, req.body);
+    res.json({status: 'Reporte actualizado'});
+};
+
+reportesController.editImagenReporte = async (req, res) => {
+    let getReporte = await reporte.findById(req.params.id);
+
+    if(getReporte.imagen){
+        try {
+            console.log(getReporte.imagen);
+            fs.unlinkSync(getReporte.imagen);
+        }
+        catch { }
+    }
+
+    await reporte.findByIdAndUpdate(req.params.id, {imagen: req.file.path});
     res.json({status: 'Reporte actualizado'});
 };
 
