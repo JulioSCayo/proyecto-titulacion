@@ -180,7 +180,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "SP":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "inundacion" || e.tipoProblema == "fuga" || e.tipoProblema == "faltaAlcantarilla" || e.tipoProblema == "alcantarillaObstruida"){
+                if(e.tipoProblema == "Inundación" || e.tipoProblema == "Fuga de agua" || e.tipoProblema == "Falta de alcantarilla" || e.tipoProblema == "Alcantarilla obstruida"){
                     reportes.push(e) //guarda en un nuevo arreglo los reportes que correspondan al tipo que soluciona la institucion del usuario que realiza la peticion
                 }
                 cont++;
@@ -190,7 +190,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "PC":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "escombros" || e.tipoProblema == "arbol"){
+                if(e.tipoProblema == "Escombros tirados" || e.tipoProblema == "Árbol caído"){
                     reportes.push(e) 
                 }
                 cont++;
@@ -200,7 +200,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "SM":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "vehiculo"){
+                if(e.tipoProblema == "Vehículo abandonado"){
                     reportes.push(e) 
                 }
                 cont++;
@@ -210,7 +210,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "IF":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "socavon"){
+                if(e.tipoProblema == "Socavón"){
                     reportes.push(e)
                 }
                 cont++;
@@ -220,7 +220,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "BM":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "incendio"){
+                if(e.tipoProblema == "Incendio"){
                     reportes.push(e)
                 }
                 cont++;
@@ -230,7 +230,7 @@ function separarReportesPorInstitucion(institucion, getReportes){
         case "CF":
             cont = 0;
             getReportes.forEach(e => {
-                if(e.tipoProblema == "alumbrado" || e.tipoProblema == "cables"){
+                if(e.tipoProblema == "Alumbrado" || e.tipoProblema == "Cables caídos"){
                     reportes.push(e)
                 }
                 cont++;
@@ -356,61 +356,61 @@ reportesController.urgenciaTiempo = async (_id) => {
 
     // Se colocan los puntos y el tiempo dependiendo del tipo de problema
     switch (getReporte.tipoProblema) {
-        case 'alumbrado': {
+        case 'Alumbrado': {
             puntos = 5;
             tiempo = 86400000; // 24 horas
             break;
         }
-        case 'inundacion': {
+        case 'Inundación': {
             puntos = 5;
             tiempo = 7200000; // 2 horas
             break;
         }
-        case 'fuga': {
+        case 'Fuga de agua': {
             puntos = 7;
             tiempo = 2400000; // 40 minutos
             break;
         }
-        case 'faltaAlcantarilla': {
+        case 'Falta de alcantarilla': {
             puntos = 7;
             tiempo = 43200000; // 12 horas
             break;
         }
-        case 'alcantarillaObstruida': {
+        case 'Alcantarilla obstruida': {
             puntos = 5;
             tiempo = 86400000; // 24 horas
             break;
         }
-        case 'escombros': {
+        case 'Escombros tirados': {
             puntos = 3;
             tiempo = 86400000; // 24 horas
             break;
         }
-        case 'vehiculo': {
+        case 'Vehículo abandonado': {
             puntos = 3;
             // tiempo = 86400000; // 24 horas
-            tiempo = 10000; // Para prueba ------------------
+            tiempo = 10000; // Para prueba ------------------ 10 segundos
             break;
         }
-        case 'arbol': {
+        case 'Árbol caído': {
             puntos = 7;
             tiempo = 43200000; // 12 horas
             break;
         }
-        case 'socavon': {
+        case 'Socavón': {
             puntos = 5;
             tiempo = 86400000; // 24 horas
             break;
         }
-        case 'cables': {
+        case 'Cables caídos': {
             puntos = 5;
             tiempo = 43200000; // 12 horas
             break;
         }
-        case 'incendio': {
+        case 'Incendio': {
             puntos = 10;
             // tiempo = 300000; // 5 minutos
-            tiempo = 2000; // Para prueba ------------------
+            tiempo = 2000; // Para prueba ------------------ 2 segundos
             break;
         }
     }
