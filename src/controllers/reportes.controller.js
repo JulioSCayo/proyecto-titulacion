@@ -14,13 +14,11 @@ const usuario = require('../models/Usuarios');
 reportesController.createReporte = async (req, res) => {
     const nuevoReporte = new reporte(req.body);
 
-    nuevoReporte.usuarios.push({_id: req.params.usuario}) ;
+    console.log(nuevoReporte);
+
     nuevoReporte.urgenciaTiempo = 0; // Se coloca la urgenciaTiempo como 0 inicialmente
     nuevoReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido inicialmente
     nuevoReporte.fechaCreacion = Date.now(); // Se coloca la fecha de creación
-
-    if(req.file)
-        nuevoReporte.imagen = req.file.path;
 
     // Si el usuario que reportó el problema es invitado la credibilidad será 1
     if(!await usuario.findById(nuevoReporte.usuarios)) {
