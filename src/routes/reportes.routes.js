@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const reportesController = require('../controllers/reportes.controller');
 const ImagenReporte = require('../middleware/reporte-imagen');
-
+const reportesGraficasController = require('../controllers/graficas.controller')
 const router = Router();
 
 // Crear reporte
@@ -48,5 +48,12 @@ router.delete('/reporte/:id', reportesController.deleteReporte);
 
 // Busca los datos de los usuarios que reportaron x problema
 router.post('/infoUsuariosReporte/', reportesController.infoUsuariosReporte);
+
+
+//  ------  RUTAS DE LOS REPORTES DE LAS GRAFICAS   -------
+router.get('/reportes-graficas/:usuario', reportesGraficasController.getReportes);
+router.get('/reportes-grafica2/:usuario', reportesGraficasController.getReportesGrafica2);
+router.get('/reportes-grafica5/:usuario', reportesGraficasController.getReportesGrafica5);
+
 
 module.exports = router;
