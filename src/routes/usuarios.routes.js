@@ -19,6 +19,7 @@ router.get('/buscarResponsable/', usuariosController.getUsuariosResponsables);
 router.get('/registro/', usuariosController.getUsuarios);
 router.get('/registro/:id', usuariosController.getUsuario);
 router.put('/registro/:id', usuariosController.editUsuario);
+router.put('/reputacion/', usuariosController.reputacionUsuario);
 router.delete('/registro/:id', usuariosController.deleteUsuario);
 
 // Buscar usuario o correo repetido
