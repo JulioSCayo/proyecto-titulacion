@@ -5,7 +5,7 @@ const reportesGraficasController = require('../controllers/graficas.controller')
 const router = Router();
 
 // Crear reporte
-router.post('/nuevo-reporte/:usuario', ImagenReporte.single('imagenReporte'), reportesController.createReporte);
+router.post('/nuevo-reporte/', reportesController.createReporte);
 
 // Reportar problema ya existente
 router.put('/replicar-reporte/:id', reportesController.replicarReporte);
