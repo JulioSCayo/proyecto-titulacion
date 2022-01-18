@@ -25,7 +25,7 @@ const reporte = require('./models/Reportes');
 const usuario = require('./models/Usuarios');
 const notificacion = require('./models/Notificaciones');
 
-cron.schedule("0 0 * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "1 * * * * *"
+cron.schedule("1 * * * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "1 * * * * *"
     reporteDesatendido();
     reporteDenegado();
 });
@@ -41,7 +41,7 @@ async function reporteDesatendido() {
 
         console.log("desatendido: " + dias + ", folio: " + repor._id);
 
-        if((dias > 1 && dias % 3) == 0) {
+        if((dias > 1) && (dias % 3 == 0)) {
             const usuariosResponsables = await notificacionResponsables(repor);
             const nuevaNotificacion = new notificacion();
 
@@ -110,12 +110,12 @@ async function reporteDenegado() {
 
     for(let notif of notifDenegados) {
         const diferencia = hoy - notif.fechaCreacion.getTime();
-        const dias = Math.floor(diferencia/(1000*60*60*24)); // Real
-        // const dias = Math.floor(diferencia/(1000*60)); // Prueba
+        // const dias = Math.floor(diferencia/(1000*60*60*24)); // Real
+        const dias = Math.floor(diferencia/(1000*60)); // Prueba
 
         console.log("Denegado: " + dias);
 
-        if(dias >= 10) {
+        if(dias >= 1) {
             await notificacion.findByIdAndDelete(notif._id);
         }
     }
