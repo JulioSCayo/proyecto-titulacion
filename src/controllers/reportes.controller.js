@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const reporte = require('../models/Reportes');
 const usuario = require('../models/Usuarios');
+const notificacion = require('../models/Notificaciones');
 
 
 // -----------------------------------------------
@@ -14,8 +15,7 @@ const usuario = require('../models/Usuarios');
 reportesController.createReporte = async (req, res) => {
     const nuevoReporte = new reporte(req.body);
 
-    console.log(nuevoReporte);
-
+    nuevoReporte.urgente = false; // Se coloca el estado como desatendido inicialmente
     nuevoReporte.urgenciaTiempo = 0; // Se coloca la urgenciaTiempo como 0 inicialmente
     nuevoReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido inicialmente
     nuevoReporte.fechaCreacion = Date.now(); // Se coloca la fecha de creación
@@ -39,14 +39,74 @@ reportesController.createReporte = async (req, res) => {
     await nuevoReporte.save(); // Se guarda el reporte
     res.status(200).json(nuevoReporte._id); // Se regresa el id del reporte al frontend
 
-    reportesController.urgenciaTiempo(nuevoReporte._id); // Se inicia el algoritmo de urgenciaTiempo
+    usuariosReponsables = await notificacionResponsables(nuevoReporte);
+    await notificacionNuevo(nuevoReporte, usuariosReponsables);
+    reportesController.urgenciaTiempo(nuevoReporte, usuariosReponsables); // Se inicia el algoritmo de urgenciaTiempo
 };
 
+async function notificacionResponsables(nuevoReporte) {
+    const usuarios = await usuario.find();
+    let usuariosResp = [];
+    let institucion = "";
+
+    switch (nuevoReporte.tipoProblema) { //checa las iniciales del usuario para saber a que institucion pertenece
+        case "Inundación":
+        case "Fuga de agua":
+        case "Falta de alcantarilla":
+        case "Alcantarilla obstruida":
+            institucion = "SP";
+        break;
+
+        case "Escombros tirados":
+        case "Árbol caído":
+            institucion = "PC";
+        break;      
+
+        case "Vehículo abandonado":
+            institucion = "SM";
+        break;
+                    
+        case "Socavón":
+            institucion = "IF";
+        break;
+
+        case "Incendio":
+            institucion = "BM";
+        break;
+        
+        case "Alumbrado":
+        case "Cables caídos":
+            institucion = "CF";
+        break;
+            
+        default:
+            console.log("Ocurrio algo raro")
+        break;
+    }
+
+    for(let usuario of usuarios) {
+        if(usuario.nombreUsuario.substr(0, 2) == institucion)
+        usuariosResp.push({_id: usuario._id});
+    }
+
+    return usuariosResp;
+}
+
+async function notificacionNuevo(nuevoReporte, usuariosResponsables) {
+    const nuevaNotificacion = new notificacion();
+        
+    nuevaNotificacion.tipoNotificacion = "nuevoProblema";
+    nuevaNotificacion.tipoProblema = nuevoReporte.tipoProblema;
+    nuevaNotificacion.folioReporte = nuevoReporte._id;
+    nuevaNotificacion.usuarios = usuariosResponsables;
+    nuevaNotificacion.fechaCreacion = Date.now();
+               
+    await nuevaNotificacion.save();
+}
 
 
 // Reportar problema ya existente
 reportesController.replicarReporte = async (req, res) => {
-    // console.log(req)
     const getReporte = await reporte.findById(req.params.id);
 
     // Si el usuario que reportó el problema es invitado la credibilidad será 1 
@@ -90,28 +150,23 @@ reportesController.reasignarReporte = async (req, res) => {
         fechaCreacion: getReporte.fechaCreacion,
         credibilidad: getReporte.credibilidad,
         urgenciaTiempo: getReporte.urgenciaTiempo,
+        urgenciaTiempo: getReporte.urgencia,
         comentario: getReporte.comentario,
         vidaRiesgo: getReporte.vidaRiesgo,
         cronico: getReporte.cronico,
         usuarios: getReporte.usuarios
     });
 
-    console.log("Viejo:");
-    console.log(getReporte);
-
     if(nuevoReporte.cronico == true) {
         // Si hay 2 coincidencias se coloca como crónico, sino como no cronico
         nuevoReporte.cronico = await reportesController.reporteCronico(nuevoReporte._id, nuevoReporte.ubicacion.latitud, nuevoReporte.ubicacion.longitud, nuevoReporte.tipoProblema);
     }
 
-    console.log("Nuevo:");
-    console.log(nuevoReporte);
-
     await nuevoReporte.save(); // Se guarda el reporte
 
     res.json({status: 'Reporte reasignado'});
 
-    reportesController.urgenciaTiempo(nuevoReporte._id); // Se inicia el algoritmo de urgenciaTiempo
+    reportesController.urgenciaTiempo(nuevoReporte); // Se inicia el algoritmo de urgenciaTiempo
 };
 
 
@@ -123,14 +178,8 @@ reportesController.refuerzoReporte = async (req, res) => {
 
     const getReporte = await reporte.findById(separar[0]);
 
-    console.log("Viejo:");
-    console.log(getReporte);
-
     getReporte.urgenciaTiempo = (parseInt(separar[1]) + 1); // Se coloca la urgencia del reporte más urgente, más 1 punto
     getReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido para poder ser reasignado a una cuadrilla de la misma institucion
-
-    console.log("Nuevo:");
-    console.log(getReporte);
     
     await reporte.findByIdAndUpdate(separar[0], getReporte); // Se actualiza el reporte
 
@@ -144,7 +193,6 @@ reportesController.refuerzoReporte = async (req, res) => {
 // Listar todos los reportes de un tipo
 reportesController.getTipoReportes = async (req, res) => {
     const getReportes = await reporte.find({tipoProblema: req.params.tipo});
-    console.log(getReportes)
     res.json(getReportes);
 };
 
@@ -166,7 +214,6 @@ reportesController.getEstadoReportes = async (req, res) => {
 
 reportesController.getReportesNoAsignados = async (req, res) => {
     const getReportes = await reporte.find({asignado: {$exists:false}});
-    console.log(req.params.nombreUsuario)
 
     res.json(separarReportesPorInstitucion(req.params.nombreUsuario.substr(0,2), getReportes));
 };
@@ -243,7 +290,6 @@ function separarReportesPorInstitucion(institucion, getReportes){
         break;
     }
 
-    console.log(reportes)
     return reportes
 }
 
@@ -257,8 +303,6 @@ reportesController.getReportes = async (req, res) => {
 // Busca reportes asignado y que el estado sea en ruta
 reportesController.getReporteAsignado = async (req, res) => {
     const getReporteAsignado = await reporte.find({$and: [{asignado: req.params.id}, {estado: "En ruta"}]});
-
-    console.log(getReporteAsignado.toString())
 
     if(getReporteAsignado.toString() == ""){
         res.json(false)
@@ -299,7 +343,6 @@ reportesController.editImagenReporte = async (req, res) => {
 
     if(getReporte.imagen){
         try {
-            console.log(getReporte.imagen);
             fs.unlinkSync(getReporte.imagen);
         }
         catch { }
@@ -345,12 +388,17 @@ reportesController.reporteCronico = async (_id, latComparada, lngComparada, tipo
 
 
 
+
+
+
+// ---------------------------------------------------------------------
+
 // Algoritmo de puntos de urgencia/tiempo
-reportesController.urgenciaTiempo = async (_id) => {
+reportesController.urgenciaTiempo = async (nuevoReporte, usuariosReponsables) => {
     let puntos = 0;
     let tiempo = 0;
 
-    const getReporte = await reporte.findById(_id);
+    const getReporte = await reporte.findById(nuevoReporte._id);
 
     let urgenciaTiempo = getReporte.urgenciaTiempo; // Se obtiene la urgencia actual del reporte
 
@@ -421,22 +469,144 @@ reportesController.urgenciaTiempo = async (_id) => {
 
         getReporte.urgenciaTiempo = urgenciaTiempo;
 
-        // Si el problema existe se entra
-        if(await reporte.findById(_id)) {
-            const reporteEstado = await reporte.findById(_id); // Se obtiene el reporte
+        // Si el problema existe entra
+        if(await reporte.findById(nuevoReporte._id)) {
+            const reporteEstado = await reporte.findById(nuevoReporte._id); // Se obtiene el reporte
 
-            if(reporteEstado.estado == 'Desatendido') // Si el estado del reporte es Desatendido se guarda el nuevo urgenciaTiempo
-                await reporte.findByIdAndUpdate(_id, getReporte);
+            if(reporteEstado.estado == 'Desatendido') { // Si el estado del reporte es Desatendido se guarda el nuevo urgenciaTiempo
+                await reporte.findByIdAndUpdate(nuevoReporte._id, getReporte);
+                console.log(reporteEstado.urgente);
+                if(!reporteEstado.urgente)
+                    await ProblemaUrgente(nuevoReporte, usuariosReponsables);
+                else
+                    await reporte.findByIdAndUpdate(nuevoReporte._id, {urgente: true});
+            }
             else
                 clearInterval(intervalo); // Si no es Desatendido se detiene el algoritmo
         }
         else
             clearInterval(intervalo); // Si no existe el reporte se detiene el algoritmo
             
-
         console.log('Urgencia por tiempo: ' + urgenciaTiempo); // Para pruebas
     }, tiempo)
 }
+
+// ---------------------------------------------------------------------
+
+async function ProblemaUrgente(nuevoReporte, usuariosReponsables) {
+    let limitePuntosUrgencia = await LimiteUrgencia(); // Se obtiene el límite de puntos de urgencia
+    let puntosUrgencia = await PuntosUrgencia(nuevoReporte._id); // Se obtienen los puntos de urgencia del reporte
+
+    console.log("Limite de puntos de urgencia: " + limitePuntosUrgencia);
+    console.log("Puntos de urgencia del reporte: " + puntosUrgencia);
+
+    if(puntosUrgencia >= limitePuntosUrgencia) { // Si los puntos de urgencia del reporte superan el límite, el problema es urgente
+        console.log("Es urgenteee")
+        await reporte.findByIdAndUpdate(nuevoReporte._id, {urgente: true});
+        await notificacionUrgente(nuevoReporte, usuariosReponsables);
+    }
+}
+
+async function LimiteUrgencia() {
+    return new Promise(async (resolve, reject) => {
+        let limite =  0;
+        let sumaUrgencias = 0;
+
+        const getReportes = await reporte.find();
+
+        for(let rep of getReportes) {
+            sumaUrgencias += await PuntosUrgencia(rep._id);
+        }
+
+        limite = (sumaUrgencias/getReportes.length) * 3/2;
+
+        resolve(limite);
+    });
+}
+
+async function PuntosUrgencia(_id) {
+    let puntosCredibilidad = await PuntosCredibilidad(_id);
+    let puntosVidaEnRiesgo = await PuntosVidaEnRiesgo(_id);
+    let puntosCronico = await PuntosCronico(_id);
+    let puntosTiempo = await PuntosTiempo(_id);
+
+    let puntosUrgencia = puntosCredibilidad + puntosVidaEnRiesgo + puntosCronico + puntosTiempo;
+
+    return puntosUrgencia;
+}
+
+async function PuntosCredibilidad(_id) {
+    return new Promise(async (resolve, reject) => {
+        let puntosCredibilidad = 0;
+        
+        const getReporte = await reporte.findById(_id);
+        
+        puntosCredibilidad = getReporte.credibilidad;
+
+        resolve(puntosCredibilidad);
+    }); 
+}
+
+async function PuntosVidaEnRiesgo(_id) {
+    return new Promise(async (resolve, reject) => {
+        let puntosVidaEnRiesgo = 0;
+        let promedioCredibilidad = 0;
+        let usuariosNoVidaRiesgo = 0;
+
+        const getReporte = await reporte.findById(_id);
+
+        promedioCredibilidad = getReporte.credibilidad / getReporte.usuarios.length
+        usuariosNoVidaRiesgo = getReporte.usuarios.length - getReporte.vidaRiesgo;
+
+        puntosVidaEnRiesgo = (3*(promedioCredibilidad) + 4*(getReporte.vidaRiesgo+1)/(usuariosNoVidaRiesgo+1));
+                
+        resolve(puntosVidaEnRiesgo);
+    });
+}
+
+async function PuntosCronico(_id) {
+    return new Promise(async (resolve, reject) => {
+        let puntosCronico = 0;
+
+        const getReporte = await reporte.findById(_id);
+
+        if(getReporte.cronico = true)
+            puntosCronico =  20;
+
+        resolve(puntosCronico);
+    });
+}
+
+async function PuntosTiempo(_id) {
+    return new Promise(async (resolve, reject) => {
+        let puntosTiempo = 0;
+
+        const getReporte = await reporte.findById(_id);
+                
+        puntosTiempo = getReporte.urgenciaTiempo;
+
+        resolve(puntosTiempo);
+    });
+}
+
+
+async function notificacionUrgente(nuevoReporte, usuariosResponsables) {
+    const nuevaNotificacion = new notificacion();
+
+    nuevaNotificacion.tipoNotificacion = "nuevoUrgente";
+    nuevaNotificacion.tipoProblema = nuevoReporte.tipoProblema;
+    nuevaNotificacion.folioReporte = nuevoReporte._id;
+    nuevaNotificacion.usuarios = usuariosResponsables;
+    nuevaNotificacion.fechaCreacion = Date.now();
+               
+    await nuevaNotificacion.save();
+}
+
+// ---------------------------------------------------------------------
+
+
+
+
 
 
 

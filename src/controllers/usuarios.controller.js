@@ -2,6 +2,7 @@ const usuariosController = {};
 
 const bcryptjs = require('bcryptjs');
 const usuario = require('../models/Usuarios');
+const notificacion = require('../models/Notificaciones');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
@@ -154,6 +155,60 @@ usuariosController.editUsuario = async (req, res) => {
     await usuario.findByIdAndUpdate(req.params.id, {contrasena: contrasena});
     }
     res.json({status: 'Usuario actualizado'});
+};
+
+
+
+// Editar reputación de un usuario
+usuariosController.reputacionUsuario = async (req, res) => {
+    let { usuarios, reputacion } = req.body;
+    let bajo = false;
+
+    if(reputacion == -1)
+        bajo = true;
+
+    for(let usr of usuarios) {
+        const getUsuario = await usuario.findById(usr);
+
+        let tipoUsuario = "comun";
+
+        if(getUsuario.usuarioAdmin)
+            tipoUsuario = "admin";
+        else if(getUsuario.usuarioEspecial)
+            tipoUsuario = "especial";
+        else if (getUsuario.usuarioResponsable)
+            tipoUsuario = "responsable";
+
+        if(tipoUsuario == "comun") {
+            reputacion += getUsuario.reputacion;
+    
+            if(bajo && reputacion == 1) {
+                const nuevaNotificacion = new notificacion();
+        
+                nuevaNotificacion.tipoNotificacion = "strike1";
+                nuevaNotificacion.usuarios = {_id: usr};
+                nuevaNotificacion.fechaCreacion = Date.now();
+                
+                await nuevaNotificacion.save();
+            }
+            if(bajo && reputacion == 0) {
+                const nuevaNotificacion = new notificacion();
+        
+                nuevaNotificacion.tipoNotificacion = "strike2";
+                nuevaNotificacion.usuarios = {_id: usr};
+                nuevaNotificacion.fechaCreacion = Date.now();
+                
+                await nuevaNotificacion.save();
+            }
+            if(bajo && reputacion < 0) {
+                console.log("Llegó a un reputación bajo 0")
+            }
+            
+            await usuario.findByIdAndUpdate(usr, {reputacion: reputacion});
+        }
+    }
+
+    res.json({status: 'Reputacion actualizada'});
 };
 
 
