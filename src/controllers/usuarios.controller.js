@@ -158,6 +158,14 @@ usuariosController.editUsuario = async (req, res) => {
 };
 
 
+// Validar un usuario especial
+usuariosController.aceptarEspecial = async (req, res) => {
+    const { validado } = req.body;
+
+    await usuario.findByIdAndUpdate(req.params.id, {usuarioEspecial: {validado: validado}});
+    res.json({status: 'Usuario actualizado'});
+};
+
 
 // Editar reputación de un usuario
 usuariosController.reputacionUsuario = async (req, res) => {
@@ -236,14 +244,10 @@ usuariosController.buscarUsuarioRepetido = async (req, res) => {
     const { nombreUsuario } = req.body;
     var existe;
 
-    console.log(nombreUsuario);
-
     const usuarioIngresado = await usuario.findOne({nombreUsuario});
     if(!usuarioIngresado){   
-        // return res.status(401).send("El usuario no existe");
         existe = false;
     }else{
-        // return res.status(300).send("El usuario si existe");
         existe = true;
     }
     res.status(200).json({existe});
@@ -255,10 +259,8 @@ usuariosController.buscarCorreoRepetido = async (req, res) => {
 
     const usuarioIngresado = await usuario.findOne({correoElectronico});
     if(!usuarioIngresado){   
-        // return res.status(401).send("El usuario no existe");
         existe = false;
     }else{
-        // return res.status(300).send("El usuario si existe");
         existe = true;  
     }
     res.status(200).json({existe});
@@ -305,6 +307,8 @@ usuariosController.signin = async (req, res) => {
     const { nombreUsuario, contrasena } = req.body;
 
     const usuarioIngresado = await usuario.findOne({nombreUsuario});
+    console.log(usuarioIngresado)
+    console.log(contrasena)
     if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
 
     //los parametros de este metodo son la contraseña de texto plano, la contraseña encriptada y el callback
@@ -316,17 +320,20 @@ usuariosController.signin = async (req, res) => {
             const token = jwt.sign({_id: usuarioIngresado._id}, 'llaveSecreta')
             let tipoUsuario = "comun";
             let idUsuario = usuarioIngresado._id;
+            let especialValidado = false;
 
             if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
 
             if(usuarioIngresado.usuarioAdmin)
                 tipoUsuario = "admin";
-            else if(usuarioIngresado.usuarioEspecial)
+            else if(usuarioIngresado.usuarioEspecial) {
                 tipoUsuario = "especial";
+                especialValidado = usuarioIngresado.usuarioEspecial.validado;
+            } 
             else if (usuarioIngresado.usuarioResponsable)
                 tipoUsuario = "responsable";
     
-            return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario})
+            return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario, especialValidado})
         }else{
             return res.status(401).send("El usuario no existe");
         }

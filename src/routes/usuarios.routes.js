@@ -19,12 +19,13 @@ router.get('/buscarResponsable/', usuariosController.getUsuariosResponsables);
 router.get('/registro/', usuariosController.getUsuarios);
 router.get('/registro/:id', usuariosController.getUsuario);
 router.put('/registro/:id', usuariosController.editUsuario);
+router.post('/aceptar-especial/:id', usuariosController.aceptarEspecial);
 router.put('/reputacion/', usuariosController.reputacionUsuario);
 router.delete('/registro/:id', usuariosController.deleteUsuario);
 
 // Buscar usuario o correo repetido
 router.post('/usuarioRepetido/', usuariosController.buscarUsuarioRepetido);
-router.get('/correoRepetido/:id', usuariosController.buscarCorreoRepetido);
+router.post('/correoRepetido/', usuariosController.buscarCorreoRepetido);
 
 router.get('/nombresUsuarios/', usuariosController.nombresUsuarios);
 // router.get('/correosUsuarios/', usuariosController.correoUsuarios);
