@@ -219,6 +219,38 @@ reportesController.getReportesNoAsignados = async (req, res) => {
 };
 
 
+
+reportesController.getReportesXMes = async (req, res) => {
+    // console.log(req.params.usuario)
+    let aux = req.params.usuario;
+    let separar = aux.split("$");
+    console.log(separar);
+    console.log(req.params.usuario)
+
+    var getDaysInMonth = function(month, year) {
+        return new Date(year, month, 0).getDate();
+       };
+       
+    let ultimoDiaDelMes = getDaysInMonth(parseInt(separar[1], 10), parseInt(separar[2], 10))
+
+    let start = separar[2]+'-'+separar[1]+'-01T14:48:00.000Z'
+    let end = separar[2]+'-'+separar[1]+'-'+ultimoDiaDelMes+'T14:48:00.000Z'   // aqui debe estar la cantidad de dias que tiene este mes
+
+    // AHORA DEBO BUSCAR EN LA BASE DE DATOS DEPENDIENDO POR MES Y AÑO
+    let getReportes
+
+    if(separar[3] == "En proceso"){
+        getReportes = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}, {"$or": [{estado: "En proceso"}, {estado: "En ruta"}]}]})
+    }else{
+        getReportes = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}, {estado: separar[3]}]})
+        // await console.log(getReportes)
+    }
+    
+    res.json(separarReportesPorInstitucion(separar[0].substr(0,2), getReportes));
+    // res.json(getReportes)
+};
+
+
 function separarReportesPorInstitucion(institucion, getReportes){
     let reportes = [], cont = 0;
     //'alumbrado':'inundacion': 'fuga': 'faltaAlcantarilla': 'alcantarillaObstruida': 'escombros': 'vehiculo': 'arbol': 'socavon': 'cables': 'incendio':

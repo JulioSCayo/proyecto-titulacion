@@ -49,6 +49,8 @@ router.delete('/reporte/:id', reportesController.deleteReporte);
 // Busca los datos de los usuarios que reportaron x problema
 router.post('/infoUsuariosReporte/', reportesController.infoUsuariosReporte);
 
+router.get('/reportes-x-mes/:usuario', reportesController.getReportesXMes);
+
 
 //  ------  RUTAS DE LOS REPORTES DE LAS GRAFICAS   -------
 router.get('/reportes-graficas/:usuario', reportesGraficasController.getReportes);
