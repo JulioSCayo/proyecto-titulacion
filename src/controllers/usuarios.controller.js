@@ -170,49 +170,60 @@ usuariosController.aceptarEspecial = async (req, res) => {
 // Editar reputación de un usuario
 usuariosController.reputacionUsuario = async (req, res) => {
     let { usuarios, reputacion } = req.body;
+    let baneado = "No";
     let bajo = false;
 
     if(reputacion == -1)
         bajo = true;
 
+    console.log(usuarios);
     for(let usr of usuarios) {
-        const getUsuario = await usuario.findById(usr);
+        if(usr._id != "000000000000000000000000") {
+            console.log("Entra, id: " + usr._id)
+            const getUsuario = await usuario.findById(usr);
 
-        let tipoUsuario = "comun";
-
-        if(getUsuario.usuarioAdmin)
-            tipoUsuario = "admin";
-        else if(getUsuario.usuarioEspecial)
-            tipoUsuario = "especial";
-        else if (getUsuario.usuarioResponsable)
-            tipoUsuario = "responsable";
-
-        if(tipoUsuario == "comun") {
-            reputacion += getUsuario.reputacion;
+            let tipoUsuario = "comun";
     
-            if(bajo && reputacion == 1) {
-                const nuevaNotificacion = new notificacion();
+            if(getUsuario.usuarioAdmin)
+                tipoUsuario = "admin";
+            else if(getUsuario.usuarioEspecial)
+                tipoUsuario = "especial";
+            else if (getUsuario.usuarioResponsable)
+                tipoUsuario = "responsable";
+    
+            if(tipoUsuario == "comun") {
+                if(getUsuario.reputacion != 10) {
+                    reputacion += getUsuario.reputacion;
         
-                nuevaNotificacion.tipoNotificacion = "strike1";
-                nuevaNotificacion.usuarios = {_id: usr};
-                nuevaNotificacion.fechaCreacion = Date.now();
+                    if(bajo && reputacion == 1) {
+                        const nuevaNotificacion = new notificacion();
                 
-                await nuevaNotificacion.save();
-            }
-            if(bajo && reputacion == 0) {
-                const nuevaNotificacion = new notificacion();
-        
-                nuevaNotificacion.tipoNotificacion = "strike2";
-                nuevaNotificacion.usuarios = {_id: usr};
-                nuevaNotificacion.fechaCreacion = Date.now();
+                        nuevaNotificacion.tipoNotificacion = "strike1";
+                        nuevaNotificacion.usuarios = {_id: usr};
+                        nuevaNotificacion.fechaCreacion = Date.now();
+                        
+                        await nuevaNotificacion.save();
+                    }
+                    if(bajo && reputacion == 0) {
+                        const nuevaNotificacion = new notificacion();
                 
-                await nuevaNotificacion.save();
+                        nuevaNotificacion.tipoNotificacion = "strike2";
+                        nuevaNotificacion.usuarios = {_id: usr};
+                        nuevaNotificacion.fechaCreacion = Date.now();
+                        
+                        await nuevaNotificacion.save();
+                    }
+                    if(bajo && reputacion < 0) {
+                        let fecha  = new Date();
+                        baneado = fecha.getTime().toString();
+                        console.log("Baneado: " + baneado)
+
+                        reputacion = -1;
+                    }
+                    
+                    await usuario.findByIdAndUpdate(usr, {reputacion: reputacion, baneado: baneado});
+                }
             }
-            if(bajo && reputacion < 0) {
-                console.log("Llegó a un reputación bajo 0")
-            }
-            
-            await usuario.findByIdAndUpdate(usr, {reputacion: reputacion});
         }
     }
 
@@ -312,7 +323,7 @@ usuariosController.signin = async (req, res) => {
     if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
 
     //los parametros de este metodo son la contraseña de texto plano, la contraseña encriptada y el callback
-    bcryptjs.compare(contrasena, usuarioIngresado.contrasena, (err, coinciden) => {
+    bcryptjs.compare(contrasena, usuarioIngresado.contrasena, async (err, coinciden) => {
         if(err){
             return res.status(401).send("error al comparar la contraseña");
         }
@@ -321,6 +332,7 @@ usuariosController.signin = async (req, res) => {
             let tipoUsuario = "comun";
             let idUsuario = usuarioIngresado._id;
             let especialValidado = false;
+            let baneado = "No";
 
             if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
 
@@ -332,8 +344,16 @@ usuariosController.signin = async (req, res) => {
             } 
             else if (usuarioIngresado.usuarioResponsable)
                 tipoUsuario = "responsable";
+
+            if(usuarioIngresado.baneado) {
+                let fecha = new Date()
+                if(parseInt(usuarioIngresado.baneado) >= (fecha.getTime() - 129600000)) // si han pasado menos de 36 desde que fue baneado no puede ingresar
+                    baneado = "Si";
+                else
+                    await usuario.findByIdAndUpdate(usr, {baneado: "No"});
+            }
     
-            return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario, especialValidado})
+            return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario, especialValidado, baneado})
         }else{
             return res.status(401).send("El usuario no existe");
         }

@@ -7,8 +7,17 @@ notificacionesController.createNotificacion = async (req, res) => {
     const nuevaNotificacion = new notificacion(req.body);
 
     nuevaNotificacion.fechaCreacion = Date.now();
+
+    if(nuevaNotificacion.usuarios.find(usr => usr._id === "000000000000000000000000")){
+        for(let i = 0; i < nuevaNotificacion.usuarios.length; i++) {
+            if(nuevaNotificacion.usuarios[i]._id === "000000000000000000000000")
+                nuevaNotificacion.usuarios.splice(i, 1);
+        }
+    }
     
-    await nuevaNotificacion.save();
+    if(nuevaNotificacion.usuarios.length) {
+        await nuevaNotificacion.save();
+    }
     res.status(200).json({'estado': 'ok'});
 };
 

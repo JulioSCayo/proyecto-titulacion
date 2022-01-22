@@ -42,6 +42,7 @@ const usuarioSchema = new Schema({
 	nombreUsuario: {type: String, required: true},
 	contrasena: {type: String, required: true},
 	reputacion: {type: Number, required: false},
+	baneado: {type: String, required: false},
     usuarioAdmin: {type: usuarioAdminSchema},
     usuarioComun: {type: usuarioComunSchema},
     usuarioEspecial: {type: usuarioEspecialSchema},

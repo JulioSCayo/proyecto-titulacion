@@ -386,6 +386,16 @@ reportesController.editImagenReporte = async (req, res) => {
 
 // Borrar un reporte
 reportesController.deleteReporte = async (req, res) => {
+    const reporteElim = await reporte.findById(req.params.id);
+
+    if(reporteElim.imagen){
+        try {
+            console.log(reporteElim.imagen);
+            fs.unlinkSync(reporteElim.imagen);
+        }
+        catch { }
+    }
+
     await reporte.findByIdAndDelete(req.params.id);
     res.json({status: 'Reporte eliminado'});
 };
@@ -468,8 +478,8 @@ reportesController.urgenciaTiempo = async (nuevoReporte, usuariosReponsables) =>
         }
         case 'Vehículo abandonado': {
             puntos = 3;
-            // tiempo = 86400000; // 24 horas
-            tiempo = 10000; // Para prueba ------------------ 10 segundos
+            tiempo = 86400000; // 24 horas
+            // tiempo = 10000; // Para prueba ------------------ 10 segundos
             break;
         }
         case 'Árbol caído': {
@@ -489,8 +499,8 @@ reportesController.urgenciaTiempo = async (nuevoReporte, usuariosReponsables) =>
         }
         case 'Incendio': {
             puntos = 10;
-            // tiempo = 300000; // 5 minutos
-            tiempo = 2000; // Para prueba ------------------ 2 segundos
+            tiempo = 300000; // 5 minutos
+            // tiempo = 2000; // Para prueba ------------------ 2 segundos
             break;
         }
     }
