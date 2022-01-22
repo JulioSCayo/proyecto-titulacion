@@ -181,8 +181,14 @@ reportesController.refuerzoReporte = async (req, res) => {
     getReporte.urgenciaTiempo = (parseInt(separar[1]) + 1); // Se coloca la urgencia del reporte más urgente, más 1 punto
     getReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido para poder ser reasignado a una cuadrilla de la misma institucion
     
-    await reporte.findByIdAndUpdate(separar[0], getReporte); // Se actualiza el reporte
+    let urgenciaMax = (parseInt(separar[1]) + 1)
+    let urgenciaOrg = (parseInt(separar[2]) + 1)
+    console.log(urgenciaOrg)
+    // separar[2] // Contiene el la urgencia original
+    await reporte.findByIdAndUpdate(separar[0], {urgenciaTiempo: urgenciaMax, estado: "Desatendido", $set: {urgenciaOriginal: urgenciaOrg}}); // Se actualiza el reporte
+    // const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido",$unset:{"asignado":""}});
 
+    console.log(separar[0])
     res.json({status: 'Refuerzos solicitados'});
 };
 
@@ -214,7 +220,7 @@ reportesController.getEstadoReportes = async (req, res) => {
 
 reportesController.getReportesNoAsignados = async (req, res) => {
     const getReportes = await reporte.find({asignado: {$exists:false}});
-
+    // o que el asigna
     res.json(separarReportesPorInstitucion(req.params.nombreUsuario.substr(0,2), getReportes));
 };
 
@@ -656,6 +662,20 @@ reportesController.infoUsuariosReporte = async (req, res) => {
 
     res.send(usuariosReporte);
 };
+
+
+
+reportesController.saltarReporte = async (req, res) => {
+    console.log(req.params.id)
+    // const reporteActualizado = await usuario.find({_id: req.params.id}, {$unset:{"asignado":""}});
+    const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido",$unset:{"asignado":""}});
+    console.log(reporteActualizado)
+    
+    res.send(true);
+};
+
+
+
 
 
 module.exports = reportesController;
