@@ -25,7 +25,7 @@ const reporte = require('./models/Reportes');
 const usuario = require('./models/Usuarios');
 const notificacion = require('./models/Notificaciones');
 
-cron.schedule("0 0 * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "1 * * * * *"
+cron.schedule("0 0 * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "* * * * * *"
     reporteDesatendido();
     reporteDenegado();
 });
@@ -37,7 +37,7 @@ async function reporteDesatendido() {
     for(let repor of reporDesatendidos) {
         const diferencia = hoy - repor.fechaCreacion.getTime();
         const dias = Math.floor(diferencia/(1000*60*60*24)); // Real
-        // const dias = Math.floor(diferencia/(1000*60)); // Pruebas
+        // const dias = Math.floor(diferencia/(1000)); // Pruebas
 
         console.log("desatendido: " + dias + ", folio: " + repor._id);
 

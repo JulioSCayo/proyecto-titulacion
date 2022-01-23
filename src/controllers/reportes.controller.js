@@ -32,6 +32,7 @@ reportesController.createReporte = async (req, res) => {
 
     // Si se recibe que es cronico desde el frontend se revisan las coincidencias de ubicación con otros problemas del mismo tipo
     if(nuevoReporte.cronico == true) {
+        console.log("Posible cronico");
         // Si hay 2 coincidencias se coloca como crónico, sino como no cronico
         nuevoReporte.cronico = await reportesController.reporteCronico(nuevoReporte._id, nuevoReporte.ubicacion.latitud, nuevoReporte.ubicacion.longitud, nuevoReporte.tipoProblema);
     }

@@ -350,7 +350,7 @@ usuariosController.signin = async (req, res) => {
                 if(parseInt(usuarioIngresado.baneado) >= (fecha.getTime() - 129600000)) // si han pasado menos de 36 desde que fue baneado no puede ingresar
                     baneado = "Si";
                 else
-                    await usuario.findByIdAndUpdate(usr, {baneado: "No"});
+                    await usuario.findByIdAndUpdate(idUsuario, {baneado: "No"});
             }
     
             return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario, especialValidado, baneado})
