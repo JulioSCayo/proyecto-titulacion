@@ -214,11 +214,37 @@ usuariosController.reputacionUsuario = async (req, res) => {
                         await nuevaNotificacion.save();
                     }
                     if(bajo && reputacion < 0) {
-                        let fecha  = new Date();
-                        baneado = fecha.getTime().toString();
-                        console.log("Baneado: " + baneado)
+                        console.log("Se elimina el usuario " + usr._id + " y sus notificacinoes por llegar a un reputación menor a 0")
 
-                        reputacion = -1;
+                        const getNotificaciones = await notificacion.find();
+
+                        for(notif of getNotificaciones) {
+                            const usuarios = notif.usuarios;
+    
+                            if(usuarios.find(usrAux => usrAux._id === usr._id)){
+    
+                                for(let i = 0; i < usuarios.length; i++) {
+                                    if(usuarios[i]._id === usr._id)
+                                        index = i;
+                                }
+                                usuarios.splice(index, 1);
+    
+                                if(!usuarios.length) {
+                                    await notificacion.findByIdAndDelete(req.params.id);
+                                }
+                                else {
+                                    await notificacion.findByIdAndUpdate(req.params.id, {usuarios: usuarios}); 
+                                }
+                            }
+                        }
+
+                        await usuario.findByIdAndDelete(usr._id);
+
+                        // let fecha  = new Date();
+                        // baneado = fecha.getTime().toString();
+                        // console.log("Baneado: " + baneado)
+
+                        // reputacion = -1;
                     }
                     
                     await usuario.findByIdAndUpdate(usr, {reputacion: reputacion, baneado: baneado});
@@ -320,7 +346,8 @@ usuariosController.signin = async (req, res) => {
     const usuarioIngresado = await usuario.findOne({nombreUsuario});
     console.log(usuarioIngresado)
     console.log(contrasena)
-    if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
+
+    if(!usuarioIngresado) return res.status(200).json({noExiste: true});
 
     //los parametros de este metodo son la contraseña de texto plano, la contraseña encriptada y el callback
     bcryptjs.compare(contrasena, usuarioIngresado.contrasena, async (err, coinciden) => {
@@ -334,7 +361,7 @@ usuariosController.signin = async (req, res) => {
             let especialValidado = false;
             let baneado = "No";
 
-            if(!usuarioIngresado) return res.status(401).send("El usuario no existe");
+            if(!usuarioIngresado) return res.status(200).json({noExiste: true});
 
             if(usuarioIngresado.usuarioAdmin)
                 tipoUsuario = "admin";
@@ -355,7 +382,7 @@ usuariosController.signin = async (req, res) => {
     
             return res.status(200).json({token, idUsuario, tipoUsuario, nombreUsuario, especialValidado, baneado})
         }else{
-            return res.status(401).send("El usuario no existe");
+            return res.status(200).json({noCoincide: true});
         }
     })
 

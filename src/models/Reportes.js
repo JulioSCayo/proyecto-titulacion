@@ -16,6 +16,7 @@ const reporteSchema = new Schema({
 	vidaRiesgo: {type: Number, required: false},
 	asignado: {type: String, required: false},
 	cronico: {type: Boolean, required: false},
+	promTiempoCronico: {type: Number, required: false},
 	fantasma: {type: Boolean, required: false},
 	urgente: {type: Boolean, required: false},
 	usuarios: [

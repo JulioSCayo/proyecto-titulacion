@@ -34,7 +34,11 @@ reportesController.createReporte = async (req, res) => {
     if(nuevoReporte.cronico == true) {
         console.log("Posible cronico");
         // Si hay 2 coincidencias se coloca como crónico, sino como no cronico
-        nuevoReporte.cronico = await reportesController.reporteCronico(nuevoReporte._id, nuevoReporte.ubicacion.latitud, nuevoReporte.ubicacion.longitud, nuevoReporte.tipoProblema);
+        let{ cronico, promTiempoCronico } = await reportesController.reporteCronico(nuevoReporte._id, nuevoReporte.ubicacion.latitud, nuevoReporte.ubicacion.longitud, nuevoReporte.tipoProblema);
+        nuevoReporte.cronico = cronico;
+
+        if(cronico)
+            nuevoReporte.promTiempoCronico = promTiempoCronico;
     }
 
     await nuevoReporte.save(); // Se guarda el reporte
@@ -415,24 +419,38 @@ reportesController.deleteReporte = async (req, res) => {
 reportesController.reporteCronico = async (_id, latComparada, lngComparada, tipo) => {
     let coincidencias = 0;
     let cronico = false;
-
+    let promTiempoCronico = 0;
+    let fechas = [];
+    
     const getReportes = await reporte.find({tipoProblema: tipo}); // Se obtienen todos los reportes del mismo tipo
 
     for(let reporteAntiguo of getReportes) { // Se revisa si el reporte coincide en la ubicación con mínimo 2 reportes ya solucionados
         if(reporteAntiguo.estado == 'Desatendido') { // Para pruebas poner en 'Desatendido' ------------------
             if( (Math.abs(reporteAntiguo.ubicacion.latitud - latComparada) * 111100) < 30 && Math.abs((reporteAntiguo.ubicacion.longitud - lngComparada) * 111100) < 30){
                 coincidencias++;
+                fechas.push(reporteAntiguo.fechaCreacion.getTime());
             }
         }
     }
 
     // Se coloca como verdadero o falso dependiendo de la cantidad de coincidencias
-    if(coincidencias >= 2)
+    if(coincidencias >= 2) {
         cronico = true;
+        let hoy = new Date().getTime();
+        fechas.push(hoy);
+
+        for(let i = 0; i < fechas.length-1; i++) {
+            promTiempoCronico += Math.floor((fechas[i+1] - fechas[i])/(1000*60*60*24));
+        }
+
+        promTiempoCronico /= fechas.length-1;
+
+        console.log(promTiempoCronico);
+    }
     else
         cronico = false;
 
-    return cronico;
+    return {cronico: cronico, promTiempoCronico: promTiempoCronico};
 }
 
 
