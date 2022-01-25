@@ -29,7 +29,7 @@ reportesGraficasController.getReportes = async (req, res) => {
     const getReportes = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}]})
     // const getReportes = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : ISODate("2022-01-01T00:00:00Z")}}, {"fechaCreacion" : {"$lte" : ISODate("2022-01-15T00:00:00Z")}}]})
     
-    res.json(separarReportesPorInstitucion(separar[0].substr(0,2), getReportes));
+    res.json(getReportes);
     // res.json(getReportes)
 };
 
@@ -55,8 +55,8 @@ reportesGraficasController.getReportesGrafica2 = async (req, res) => {
     // let reportesSolucionados = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}, {estado: 'Solucionado'} ]})
     // let reportesNoSolucionados = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}, {estado: {$ne: 'Solucionado'}} ]})
 
-    let solucionados = separarReportesPorInstitucion(separar[0].substr(0,2), reportesSolucionados)
-    let elResto = separarReportesPorInstitucion(separar[0].substr(0,2), reporteshechos)
+    let solucionados = reportesSolucionados;
+    let elResto = reporteshechos;
 
     res.json({ solucionados, elResto})
 };
@@ -75,88 +75,8 @@ reportesGraficasController.getReportesGrafica5 = async (req, res) => {
 
     let getReportes = await reporte.find({"$and" : [{"fechaCreacion" : {"$gte" : start}}, {"fechaCreacion" : {"$lte" : end}}, {"cronico" : true}]})
 
-    res.json(separarReportesPorInstitucion(separar[0].substr(0,2), getReportes))
+    res.json(getReportes)
 };
-
-
-
-
-
-
-function separarReportesPorInstitucion(institucion, getReportes){
-    let reportes = [], cont = 0;
-    //'alumbrado':'inundacion': 'fuga': 'faltaAlcantarilla': 'alcantarillaObstruida': 'escombros': 'vehiculo': 'arbol': 'socavon': 'cables': 'incendio':
-    switch (institucion) { //checa las iniciales del usuario para saber a que institucion pertenece
-        case "SP":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "inundacion" || e.tipoProblema == "fuga" || e.tipoProblema == "faltaAlcantarilla" || e.tipoProblema == "alcantarillaObstruida"){
-                    reportes.push(e) //guarda en un nuevo arreglo los reportes que correspondan al tipo que soluciona la institucion del usuario que realiza la peticion
-                }
-                cont++;
-            });
-        break;      
-
-        case "PC":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "escombros" || e.tipoProblema == "arbol"){
-                    reportes.push(e) 
-                }
-                cont++;
-            });
-        break;      
-
-        case "SM":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "vehiculo"){
-                    reportes.push(e) 
-                }
-                cont++;
-            });
-        break;      
-                    
-        case "IF":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "socavon"){
-                    reportes.push(e)
-                }
-                cont++;
-            });
-        break;
-
-        case "BM":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "incendio"){
-                    reportes.push(e)
-                }
-                cont++;
-            }); 
-        break;
-        
-        case "CF":
-            cont = 0;
-            getReportes.forEach(e => {
-                if(e.tipoProblema == "alumbrado" || e.tipoProblema == "cables"){
-                    reportes.push(e)
-                }
-                cont++;
-            });
-        break;
-            
-        default:
-            console.log("Ocurrio algo raro (y por ende se enviaron todos los reportes)")
-            reportes = getReportes;
-        break;
-    }
-
-    // console.log(reportes)
-    return reportes
-}
-
 
 
 module.exports = reportesGraficasController;

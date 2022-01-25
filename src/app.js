@@ -25,7 +25,7 @@ const reporte = require('./models/Reportes');
 const usuario = require('./models/Usuarios');
 const notificacion = require('./models/Notificaciones');
 
-cron.schedule("0 0 * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "* * * * * *"
+cron.schedule("0 0 * * *", () => { // Dejar en "0 0 * * *" para que se haga a las 00:00 todos los días || "* * * * * *" para pruebas de 1 segundo
     reporteDesatendido();
     reporteDenegado();
 });
@@ -36,10 +36,10 @@ async function reporteDesatendido() {
     
     for(let repor of reporDesatendidos) {
         const diferencia = hoy - repor.fechaCreacion.getTime();
-        const dias = Math.floor(diferencia/(1000*60*60*24)); // Real
-        // const dias = Math.floor(diferencia/(1000)); // Pruebas
+        const dias = Math.floor(diferencia/(1000*60*60*24)); // Real, 1 día
+        // const dias = Math.floor(diferencia/(1000)); // Prueba de 1 segundo
 
-        console.log("desatendido: " + dias + ", folio: " + repor._id);
+        console.log("El reporte " + repor._id + "lleva desatendido " + dias + " días");
 
         if((dias > 1) && (dias % 3 == 0)) {
             const usuariosResponsables = await notificacionResponsables(repor);
@@ -110,12 +110,12 @@ async function reporteDenegado() {
 
     for(let notif of notifDenegados) {
         const diferencia = hoy - notif.fechaCreacion.getTime();
-        // const dias = Math.floor(diferencia/(1000*60*60*24)); // Real
-        const dias = Math.floor(diferencia/(1000*60)); // Prueba
+        const dias = Math.floor(diferencia/(1000*60*60*24)); // Real, 1 día
+        // const dias = Math.floor(diferencia/(1000)); // Prueba de 1 segundo
 
-        console.log("Denegado: " + dias);
+        console.log("El reporte " + notif.folioReporte + "fue denegado hace " + dias + " días");
 
-        if(dias >= 1) {
+        if(dias >= 10) {
             await notificacion.findByIdAndDelete(notif._id);
         }
     }
