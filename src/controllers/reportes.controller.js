@@ -178,6 +178,7 @@ reportesController.refuerzoReporte = async (req, res) => {
     let separar = aux.split("$");
 
     const getReporte = await reporte.findById(separar[0]);
+    let urgenciaTiempoOrg = getReporte.urgenciaTiempo
 
     getReporte.urgenciaTiempo = (parseInt(separar[1]) + 1); // Se coloca la urgencia del reporte más urgente, más 1 punto
     getReporte.estado = 'Desatendido'; // Se coloca el estado como desatendido para poder ser reasignado a una cuadrilla de la misma institucion
@@ -186,7 +187,7 @@ reportesController.refuerzoReporte = async (req, res) => {
     let urgenciaOrg = (parseInt(separar[2]) + 1)
     console.log(urgenciaOrg)
     // separar[2] // Contiene el la urgencia original
-    await reporte.findByIdAndUpdate(separar[0], {urgenciaTiempo: urgenciaMax, estado: "Desatendido", $set: {urgenciaOriginal: urgenciaOrg}}); // Se actualiza el reporte
+    await reporte.findByIdAndUpdate(separar[0], {urgenciaTiempo: urgenciaMax, estado: "Desatendido", urgenciaOriginal: urgenciaTiempoOrg, $unset:{"asignado":""}}); // Se actualiza el reporte
     // const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido",$unset:{"asignado":""}});
 
     console.log(separar[0])
@@ -373,7 +374,19 @@ reportesController.getReporte = async (req, res) => {
 
 // Editar un reporte
 reportesController.editReporte = async (req, res) => {
-    await reporte.findByIdAndUpdate(req.params.id, req.body);
+    const getReporte = await reporte.findByIdAndUpdate(req.params.id, req.body);
+     
+    console.log(getReporte);
+    if(getReporte.urgenciaOriginal){// o que si se asigno despues de pedir refuerzos
+        let regresar = getReporte.urgenciaOriginal
+        let id = getReporte._id
+        let cambio = getReporte.urgenciaTiempo
+
+        console.log("id: " + id + " | antigua: " + cambio + " | " + " actu: " + regresar)
+        await reporte.findByIdAndUpdate(id, {urgenciaTiempo: regresar,$unset:{"urgenciaOriginal":""}});
+
+    }
+    
     res.json({status: 'Reporte actualizado'});
 };
 
@@ -675,12 +688,26 @@ reportesController.infoUsuariosReporte = async (req, res) => {
 };
 
 
-
 reportesController.saltarReporte = async (req, res) => {
     console.log(req.params.id)
     // const reporteActualizado = await usuario.find({_id: req.params.id}, {$unset:{"asignado":""}});
     const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido",$unset:{"asignado":""}});
     console.log(reporteActualizado)
+    
+    res.send(true);
+};
+
+
+reportesController.terminoRuta = async (req, res) => {
+    console.log(req.params.id)
+
+    const getReporte = await reporte.findById(req.params.id);
+
+    if(getReporte.estado == "En ruta"){
+        const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido", $unset:{"asignado":""}});
+        console.log(reporteActualizado)
+    }
+
     
     res.send(true);
 };

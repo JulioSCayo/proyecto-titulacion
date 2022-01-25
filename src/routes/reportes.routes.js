@@ -53,6 +53,8 @@ router.get('/reportes-x-mes/:usuario', reportesController.getReportesXMes);
 
 router.get('/saltar-reporte/:id', reportesController.saltarReporte);
 
+router.get('/termino-ruta/:id', reportesController.terminoRuta);
+
 
 //  ------  RUTAS DE LOS REPORTES DE LAS GRAFICAS   -------
 router.get('/reportes-graficas/:usuario', reportesGraficasController.getReportes);

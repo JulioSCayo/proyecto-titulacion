@@ -18,6 +18,7 @@ const reporteSchema = new Schema({
 	cronico: {type: Boolean, required: false},
 	fantasma: {type: Boolean, required: false},
 	urgente: {type: Boolean, required: false},
+	urgenciaOriginal: {type: Number, require: false},
 	usuarios: [
         {
             _id: {type: Types.ObjectId, required: false}
