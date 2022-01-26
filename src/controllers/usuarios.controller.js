@@ -179,7 +179,6 @@ usuariosController.reputacionUsuario = async (req, res) => {
     console.log(usuarios);
     for(let usr of usuarios) {
         if(usr._id != "000000000000000000000000") {
-            console.log("Entra, id: " + usr._id)
             const getUsuario = await usuario.findById(usr);
 
             let tipoUsuario = "comun";
@@ -192,63 +191,64 @@ usuariosController.reputacionUsuario = async (req, res) => {
                 tipoUsuario = "responsable";
     
             if(tipoUsuario == "comun") {
-                if(getUsuario.reputacion != 10) {
-                    reputacion += getUsuario.reputacion;
+                reputacion += getUsuario.reputacion;
+
+                if(reputacion > 10)
+                    reputacion = 10;
         
-                    if(bajo && reputacion == 1) {
-                        const nuevaNotificacion = new notificacion();
-                
-                        nuevaNotificacion.tipoNotificacion = "strike1";
-                        nuevaNotificacion.usuarios = {_id: usr};
-                        nuevaNotificacion.fechaCreacion = Date.now();
+                if(bajo && reputacion == 1) {
+                    const nuevaNotificacion = new notificacion();
+            
+                    nuevaNotificacion.tipoNotificacion = "strike1";
+                    nuevaNotificacion.usuarios = {_id: usr};
+                    nuevaNotificacion.fechaCreacion = Date.now();
                         
-                        await nuevaNotificacion.save();
-                    }
-                    if(bajo && reputacion == 0) {
-                        const nuevaNotificacion = new notificacion();
+                    await nuevaNotificacion.save();
+                }
+                if(bajo && reputacion == 0) {
+                    const nuevaNotificacion = new notificacion();
                 
-                        nuevaNotificacion.tipoNotificacion = "strike2";
-                        nuevaNotificacion.usuarios = {_id: usr};
-                        nuevaNotificacion.fechaCreacion = Date.now();
+                    nuevaNotificacion.tipoNotificacion = "strike2";
+                    nuevaNotificacion.usuarios = {_id: usr};
+                    nuevaNotificacion.fechaCreacion = Date.now();
                         
-                        await nuevaNotificacion.save();
-                    }
-                    if(bajo && reputacion < 0) {
-                        console.log("Se elimina el usuario " + usr._id + " y sus notificacinoes por llegar a un reputación menor a 0")
+                    await nuevaNotificacion.save();
+                }
+                if(bajo && reputacion < 0) {
+                    console.log("Se elimina el usuario " + usr._id + " y sus notificacinoes por llegar a un reputación menor a 0")
 
-                        const getNotificaciones = await notificacion.find();
+                    const getNotificaciones = await notificacion.find();
 
-                        for(notif of getNotificaciones) {
-                            const usuarios = notif.usuarios;
+                    for(notif of getNotificaciones) {
+                        const usuarios = notif.usuarios;
     
-                            if(usuarios.find(usrAux => usrAux._id === usr._id)){
+                        if(usuarios.find(usrAux => usrAux._id === usr._id)){
     
-                                for(let i = 0; i < usuarios.length; i++) {
-                                    if(usuarios[i]._id === usr._id)
-                                        index = i;
-                                }
-                                usuarios.splice(index, 1);
+                            for(let i = 0; i < usuarios.length; i++) {
+                                if(usuarios[i]._id === usr._id)
+                                    index = i;
+                            }
+                            usuarios.splice(index, 1);
     
-                                if(!usuarios.length) {
-                                    await notificacion.findByIdAndDelete(req.params.id);
-                                }
-                                else {
-                                    await notificacion.findByIdAndUpdate(req.params.id, {usuarios: usuarios}); 
-                                }
+                            if(!usuarios.length) {
+                                await notificacion.findByIdAndDelete(req.params.id);
+                            }
+                            else {
+                                await notificacion.findByIdAndUpdate(req.params.id, {usuarios: usuarios}); 
                             }
                         }
-
-                        await usuario.findByIdAndDelete(usr._id);
-
-                        // let fecha  = new Date();
-                        // baneado = fecha.getTime().toString();
-                        // console.log("Baneado: " + baneado)
-
-                        // reputacion = -1;
                     }
-                    
-                    await usuario.findByIdAndUpdate(usr, {reputacion: reputacion, baneado: baneado});
+
+                    await usuario.findByIdAndDelete(usr._id);
+
+                    // let fecha  = new Date();
+                    // baneado = fecha.getTime().toString();
+                    // console.log("Baneado: " + baneado)
+
+                    // reputacion = -1;
                 }
+                    
+                await usuario.findByIdAndUpdate(usr, {reputacion: reputacion, baneado: baneado});   
             }
         }
     }
