@@ -707,8 +707,47 @@ reportesController.terminoRuta = async (req, res) => {
         const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {estado: "Desatendido", $unset:{"asignado":""}});
         console.log(reporteActualizado)
     }
+    res.send(true);
+};
 
-    
+
+reportesController.quitarFantasma = async (req, res) => {
+    console.log(req.params.id)
+
+    const getReporte = await reporte.findById(req.params.id);
+
+    if(getReporte.fantasma > 0){
+        const reporteActualizado = await reporte.findByIdAndUpdate(req.params.id, {fantasma: 0 });
+        console.log(reporteActualizado)
+    }
+    res.send(true);
+};
+
+
+reportesController.modificarReputacionUsr = async (req, res) => {
+    console.log(req.params.id)
+    let fechaA = new Date()
+
+    const getUsr = await usuario.findById(req.params.id);
+    let nuevaReputacion = getUsr.reputacion - 1
+
+        await usuario.findByIdAndUpdate(req.params.id, {reputacion: nuevaReputacion, baneado: fechaA.getTime() });
+        console.log("reputacion modificada")
+        
+    res.send(true);
+};
+
+
+reportesController.eliminarFantasma = async (req, res) => {
+    const getReporte = await reporte.findById(req.params.id);
+
+    console.log(getReporte.usuarios.length)
+
+    if(getReporte.usuarios.length < 2){ // si el unico reporte es del usuario primero entonces elimina el reporte 
+        console.log(req.params.id)
+        await reporte.findByIdAndDelete(req.params.id);
+    }
+
     res.send(true);
 };
 

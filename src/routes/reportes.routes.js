@@ -55,6 +55,12 @@ router.get('/saltar-reporte/:id', reportesController.saltarReporte);
 
 router.get('/termino-ruta/:id', reportesController.terminoRuta);
 
+router.get('/quitar-fantasma/:id', reportesController.quitarFantasma);
+
+router.get('/bajar-reputacion-usr/:id', reportesController.modificarReputacionUsr);
+
+router.get('/eliminar-fantasma/:id', reportesController.eliminarFantasma);
+
 
 //  ------  RUTAS DE LOS REPORTES DE LAS GRAFICAS   -------
 router.get('/reportes-graficas/:usuario', reportesGraficasController.getReportes);
